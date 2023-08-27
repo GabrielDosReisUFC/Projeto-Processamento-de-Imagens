@@ -2,6 +2,11 @@ from PIL import Image
 import matplotlib.pyplot as plt
 import retornarPath
 import threading
+import numpy as np
+
+def plotar(array):
+    plt.plot(range(0,256),array)
+    plt.show()
 
 def contar_hist(height, width, dados_imagem):
     contagem_pixel = [0] * 256
@@ -13,16 +18,13 @@ def contar_hist(height, width, dados_imagem):
 
 def hist(file_path):
     imagem_original = Image.open(file_path)  
-    dados_imagem = imagem_original.load()
+    #imagem_original.save(file_path)
+    dados_imagem = np.array(imagem_original)
     pixel_total = imagem_original.height * imagem_original.width
     
     contagem_pixel = contar_hist(imagem_original.height, imagem_original.width, dados_imagem)     
     
     return imagem_original, pixel_total, dados_imagem, pixel_total, contagem_pixel
-
-def plotar(array):
-    plt.plot(range(0,256),array)
-    plt.show()
 
 def histograma(file_path):
     imagem_original, pixel_total, dados_imagem, pixel_total, contagem_pixel = hist(file_path)
@@ -45,8 +47,11 @@ def histograma_equalizado(file_path):
             dados_imagem[coluna, linha] = round(255*acumulado[i]/pixel_total)
     
     nova_contagem = contar_hist(imagem_original.height, imagem_original.width, dados_imagem)
+    plotar(nova_contagem)
 
-    thread = threading.Thread(target=plotar, args=(nova_contagem,))
-    thread.start()
-
-    return retornarPath.path(file_path,imagem_original)
+    img2 = Image.fromarray(dados_imagem)
+    imagem_original.close()
+    #thread = threading.Thread(target=plotar, args=(nova_contagem,))
+    #thread.start()
+    #thread.join()
+    return retornarPath.path(file_path,img2)
