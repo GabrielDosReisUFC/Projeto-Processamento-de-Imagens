@@ -1,38 +1,38 @@
-from PIL import Image
+from tkinter import *
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.pyplot as plt
 import retornarPath
-import threading
+import multiprocessing
 import numpy as np
+from PIL import Image, ImageTk
 
-def plotar(array):
-    plt.plot(range(0,256),array)
-    plt.show()
-
-def contar_hist(height, width, dados_imagem):
+def contagem_de_pixels(height, width, dados_imagem):
     contagem_pixel = [0] * 256
     for linha in range(height):
         for coluna in range(width):
-            i = round(dados_imagem[coluna, linha])
+            i = round(dados_imagem[linha,coluna])
             contagem_pixel[i] += 1
     return contagem_pixel
 
-def hist(file_path):
+def histograma(file_path):
+    imagem_original = Image.open(file_path)  
+    #imagem_original.save(file_path)
+    dados_imagem = np.array(imagem_original)
+    # pixel_total = imagem_original.height * imagem_original.width
+
+    contagem_pixel = contagem_de_pixels(imagem_original.height, imagem_original.width, dados_imagem) 
+
+    plt.plot(range(0,256),contagem_pixel)
+    plt.show()
+
+def histograma_equalizado(file_path):
+    
     imagem_original = Image.open(file_path)  
     #imagem_original.save(file_path)
     dados_imagem = np.array(imagem_original)
     pixel_total = imagem_original.height * imagem_original.width
     
-    contagem_pixel = contar_hist(imagem_original.height, imagem_original.width, dados_imagem)     
-    
-    return imagem_original, pixel_total, dados_imagem, pixel_total, contagem_pixel
-
-def histograma(file_path):
-    imagem_original, pixel_total, dados_imagem, pixel_total, contagem_pixel = hist(file_path)
-
-    plotar(contagem_pixel)
-
-def histograma_equalizado(file_path):
-    imagem_original, pixel_total, dados_imagem, pixel_total, contagem_pixel = hist(file_path)
+    contagem_pixel = contagem_de_pixels(imagem_original.height, imagem_original.width, dados_imagem) 
     acumulado = [0] * 256
     cont = 0
     
@@ -43,15 +43,10 @@ def histograma_equalizado(file_path):
 
     for linha in range(imagem_original.height):
         for coluna in range(imagem_original.width):
-            i = round(dados_imagem[coluna, linha])
-            dados_imagem[coluna, linha] = round(255*acumulado[i]/pixel_total)
+            
+            i = round(dados_imagem[linha,coluna])
+            dados_imagem[linha,coluna] = round(255*acumulado[i]/pixel_total)
     
-    nova_contagem = contar_hist(imagem_original.height, imagem_original.width, dados_imagem)
-    plotar(nova_contagem)
-
     img2 = Image.fromarray(dados_imagem)
     imagem_original.close()
-    #thread = threading.Thread(target=plotar, args=(nova_contagem,))
-    #thread.start()
-    #thread.join()
-    return retornarPath.path(file_path,img2)
+    return retornarPath.path(file_path,img2),contagem_pixel
