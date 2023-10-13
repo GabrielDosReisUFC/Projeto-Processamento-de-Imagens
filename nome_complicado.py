@@ -1,25 +1,22 @@
-from PIL import Image,ImageTk
+from PIL import Image
 
 # Função para ocultar uma mensagem em uma imagem
-def hide_message(image_path, message, output_path):
+def hide_message(image_path,message):
+    path_temp = "modificado_escondido.tif"
     # Abra a imagem .tif
-    img = Image.open(image_path)
-    
-    # Converta a mensagem em uma sequência de bytes
+    img_aux = Image.open(image_path)
     binary_message = ''.join(format(ord(char), '08b') for char in message)
-    
+
     # Verifique se a mensagem cabe na imagem
-    print(len(binary_message),img.width * img.height)
-    if len(binary_message) > img.width * img.height:
-        print(1)
+    if len(binary_message) > img_aux.width * img_aux.height:
         raise ValueError("A mensagem é muito longa para ser ocultada na imagem.")
 
     data_index = 0
 
     # Percorra cada pixel da imagem
-    for x in range(img.width):
-        for y in range(img.height):
-            pixel = int(img.getpixel((x, y)))
+    for x in range(img_aux.width):
+        for y in range(img_aux.height):
+            pixel = int(img_aux.getpixel((x, y)))
 
             # Modifique o último bit de cada canal RGB para ocultar a mensagem
             
@@ -28,10 +25,14 @@ def hide_message(image_path, message, output_path):
                 data_index += 1
 
             # Atualize o pixel na imagem
-            img.putpixel((x, y), pixel)
+            img_aux.putpixel((x, y), pixel)
     
     # Salve a imagem resultante
-    img.save(output_path)
+    img_aux.save(path_temp)
+    img_aux.close()
+    img = Image.open(path_temp)
+    img.save(image_path)
+    img.close()
 
 # Função para extrair uma mensagem de uma imagem oculta
 def extract_and_display_message(image_path):
@@ -55,12 +56,4 @@ def extract_and_display_message(image_path):
         if i.isprintable():
             text += i
     return text
-
-# Exemplo de uso
-if __name__ == "__main__":
-    # Oculte uma mensagem em uma imagem .tif
-    hide_message("modificado.tif", "Mensagem secreta", "imagem_oculta.tif")
-
-    # Extraia a mensagem da imagem oculta .tif
-    extracted_message = extract_and_display_message("imagem_oculta.tif")
     

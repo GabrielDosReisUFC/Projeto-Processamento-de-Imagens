@@ -18,6 +18,7 @@ def histograma(file_path):
     imagem_original = Image.open(file_path)  
     #imagem_original.save(file_path)
     dados_imagem = np.array(imagem_original)
+    print(imagem_original.width,imagem_original.height)
     # pixel_total = imagem_original.height * imagem_original.width
 
     contagem_pixel = contagem_de_pixels(imagem_original.height, imagem_original.width, dados_imagem) 
@@ -25,7 +26,7 @@ def histograma(file_path):
     plt.plot(range(0,256),contagem_pixel)
     plt.show()
 
-def histograma_equalizado(file_path):
+def histograma_equalizado(file_path,salvar):
     
     imagem_original = Image.open(file_path)  
     #imagem_original.save(file_path)
@@ -36,7 +37,6 @@ def histograma_equalizado(file_path):
     acumulado = [0] * 256
     cont = 0
     
-    # hits acumulado
     for i in contagem_pixel:
         acumulado[cont] = acumulado[cont-1]+i
         cont += 1
@@ -49,4 +49,7 @@ def histograma_equalizado(file_path):
     
     img2 = Image.fromarray(dados_imagem)
     imagem_original.close()
-    return retornarPath.path(file_path,img2),contagem_pixel
+    img2.save(salvar)
+    contagem_equalizada = contagem_de_pixels(img2.height,img2.width,np.array(img2))
+    img2.close()
+    return contagem_equalizada
