@@ -9,7 +9,7 @@ import os
 import matplotlib.pyplot as plt
 import negativo
 import correcao_gamma
-import transformcao_logaritmica
+import transformacao_logaritmica
 import histograma
 import nome_complicado
 import limearizacao
@@ -197,7 +197,7 @@ def aplicar_gamma(tela,Path_img):
 
 def aplicar_transformacao_logaritmica(tela,Path_img):
     if Path_img:
-        transformcao_logaritmica.transformacao_logaritmica(Path_img,caminho_modificado)
+        transformacao_logaritmica.transformacao_logaritmica(Path_img,caminho_modificado)
         Application.display_image(tela,caminho_modificado)
     else:
         messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
@@ -289,7 +289,7 @@ def aplicar_filtros(tela,Path_img):
         for linha in matrix:
             valores_linhas = []
             for entry in linha:
-                valor = int(entry.get())
+                valor = float(entry.get())
                 valores_linhas.append(valor)
             #  = [entry.get() for entry in linha]
             matrix_kernel.append(np.array(valores_linhas))

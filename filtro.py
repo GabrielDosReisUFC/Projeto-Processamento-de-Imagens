@@ -1,7 +1,7 @@
-from PIL import Image, ImageFilter
+from PIL import Image, ImageDraw
 import numpy as np
 import cv2
-
+import math
 # Função para realizar a convolução entre a imagem e o kernel
 
 def convolucao(img, kernel,salvar):
@@ -27,6 +27,10 @@ def convolucao(img, kernel,salvar):
     imga.save(salvar)
     # imga.show()
     imga.close()
+
+def convolicao_media(img,tam,salvar):
+    matrix = np.ones((tam,tam),dtype=int) * pow(tam,2)
+    convolucao(img,matrix,salvar)
 
 def convoluca_mediana(path, tam,salvar):
     image = Image.open(path)
@@ -162,21 +166,42 @@ def sorbel(img,salvar):
     # nova_imga.show()
     nova_imga.save(salvar)
     
+def convolucao_rgb(img, kernel):
+    image = Image.open(img)
+    width, height = image.size
+    kernel_width, kernel_height = kernel.shape
+    padding = kernel_width // 2
+    imagem_suavizada = Image.new("RGB", image.size)
+    pixels_suavizados = imagem_suavizada.load()
+    # Cria uma nova imagem vazia para armazenar o resultado
+    for x in range(0, width):
+        # auxiliar = []
+        for y in range(0, height):
+            accumulator_r = 0
+            accumulator_g = 0
+            accumulator_b = 0
+            for i in range(-padding, padding + 1):
+                for j in range(-padding, padding + 1):
+                    if (x + i >= 0 and x + i < width) and (y + j >= 0 and y + j < height):
+                      r,g,b = image.getpixel((x + i, y + j))
+                      accumulator_r += math.floor(r * kernel[i + padding, j + padding])
+                      accumulator_g += math.floor(r * kernel[i + padding, j + padding])
+                      accumulator_b += math.floor(r * kernel[i + padding, j + padding])
+            pixels_suavizados[x,y] = (accumulator_r,accumulator_g,accumulator_b)
 
-# Carrega a imagem com Pillow
-# image = Image.open('sol.tif')
-# sorbel(image)
-# imga2 = cv2.imread('robo.tif')
-# img1 = image/np.max(np.max(image))
-# img_normalizada = Image.fromarray(img1)
-# laplaciano(image)
-# kernel = np.array([[1, 1, 1], [1, 1, 1,], [1, 1, 1]])
-# convoluca_mediana(img_normalizada, 3)
-# out = cv2.medianBlur(imga2, 3)
-# cv2.imshow('imagem',out)
-# cv2.waitKey(0)
-# cv2.destroyAllWindows()
-# imagem_suavizada = image.filter(ImageFilter.Kernel(size=(5,5), kernel=kernel2.flatten(),scale=1/25))
-# convolucao(img_normalizada, kernel)
-# imagem_suavizada.show()
-# high_bost(image)
+    # imga_array = np.array(imagem_suavizada)
+    # print(imga_array)
+    # imga_normalizada = Image.fromarray(imga_array/np.max(np.max(np.max(imga_array)))* 255).astype(np.uint8)
+    # imga = Image.fromarray(imga_normalizada)
+    # imga.show()
+    imagem_suavizada.show()
+
+def suavizacao_rgb(img):
+    kernel = np.array([[1, 1, 1], [1, 1, 1,], [1, 1, 1]])*1/9
+    convolucao_rgb(img,kernel)
+
+def agucamento_rgb(img):
+    kernel = np.array([[-1, -1, -1], [-1, 9, -1,], [-1, -1, -1]])
+    convolucao_rgb(img,kernel)
+
+agucamento_rgb("mulher.tif")

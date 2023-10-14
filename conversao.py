@@ -1,5 +1,6 @@
-import colorsys
 import math
+from PIL import Image,ImageDraw
+import numpy as np
 
 def RGB_HSV(R,G,B):
     H = 0 ; S = 0 ; V = 0
@@ -23,9 +24,27 @@ def RGB_HSV(R,G,B):
         S = delta/C_max * 100
 
     V = C_max * 100
-
+    H = H * 100 / 360
+    # S = S * 255 / 100
+    # V = V * 255 / 100
     return math.floor(H),math.floor(S),math.floor(V)
 
+def converter_RGB_HSV(img):
+    imagem_original = Image.open(img)
+    pixels = imagem_original.load()
+    imagem_hsv = Image.new('HSV',(imagem_original.width,imagem_original.height))
+    nova_imagem = ImageDraw.Draw(imagem_hsv)
+    for linha in range(imagem_original.height):
+        for coluna in range(imagem_original.width):
+            r,g,b = imagem_original.getpixel((linha,coluna))
+            nova_imagem.point((linha,coluna),fill=RGB_HSV(r,g,b))
+
+    return imagem_hsv
+
+    # nao eh possivel salvar
+    # imagem_hsv.save("foguette.png")
+    
+# converter_RGB_HSV("mulher.tif")
 def HSV_RGB(H,S,V):
     S = S/100
     V = V/100
@@ -63,16 +82,52 @@ def HSV_RGB(H,S,V):
     G = (G+m)*255
     B = (B+m)*255
 
-    print(R,G,B)
     return math.floor(R),math.floor(G),math.floor(B)
 
-def escala_cinza(r,g,b):
-    cinza = (r+g+b)//3
-    return cinza
+def converter_HSV_RGB(img):
+    try:
+        imagem_original = Image.open(img)
+    except:
+        imagem_original = img
+    pixels = imagem_original.load()
+    imagem_rgb = Image.new('RGB',(imagem_original.width,imagem_original.height))
+    nova_imagem = ImageDraw.Draw(imagem_rgb)
+    for linha in range(imagem_original.height):
+        for coluna in range(imagem_original.width):
+            H,S,V = imagem_original.getpixel((linha,coluna))
+            nova_imagem.point((linha,coluna),fill=HSV_RGB(H,S,V))
+
+    return imagem_rgb
+
+    # nao eh possivel salvar
+    # imagem_hsv.save("foguette.png")
+
+def converter_escala_cinza(img,salvar):
+    imagem_original = Image.open(img)
+    imagem_cinza = Image.new('L',(imagem_original.width,imagem_original.height))
+    nova_imagem = ImageDraw.Draw(imagem_cinza)
+    for linha in range(imagem_original.height):
+        for coluna in range(imagem_original.width):
+            r,g,b = imagem_original.getpixel((linha,coluna))
+            nova_imagem.point((linha,coluna),fill=((r+g+b)//3))
+
+    imagem_cinza.save(salvar)
+
 
 def escala_cinza_ponderada(r,g,b,peso1,peso2,peso3):
     cinza = (peso1*r,peso2*g,peso3*b)
     return cinza
+
+def converter_escala_cinza_ponderada(img,salvar,peso1,peso2,peso3):
+    imagem_original = Image.open(img)
+    imagem_cinza = Image.new('L',(imagem_original.width,imagem_original.height))
+    nova_imagem = ImageDraw.Draw(imagem_cinza)
+    for linha in range(imagem_original.height):
+        for coluna in range(imagem_original.width):
+            r,g,b = imagem_original.getpixel((linha,coluna))
+            nova_imagem.point((linha,coluna),fill=escala_cinza_ponderada(r,g,b,peso1,peso2,peso3))
+
+    imagem_cinza.save(salvar)
 
 def negativo(r,g,b):
     neg_r = 255 - r
@@ -80,10 +135,32 @@ def negativo(r,g,b):
     neg_b = 255 - b
     return neg_r,neg_g,neg_b
 
+def converter_negativo(img,salvar):
+    imagem_original = Image.open(img)
+    imagem_cinza = Image.new('RGB',(imagem_original.width,imagem_original.height))
+    nova_imagem = ImageDraw.Draw(imagem_cinza)
+    for linha in range(imagem_original.height):
+        for coluna in range(imagem_original.width):
+            r,g,b = imagem_original.getpixel((linha,coluna))
+            nova_imagem.point((linha,coluna),fill=negativo(r,g,b))
+
+    imagem_cinza.save(salvar)
+
 def serpia(r,g,b):
     serpia_r = (0.393 * r + 0.769 * g + 0.189 * b)
     serpia_g = (0.349 * r + 0.686 * g + 0.168 * b)
     serpia_b = (0.272 * r + 0.534 * g + 0.131 * b)
 
-    return serpia_r,serpia_g,serpia_b
-HSV_RGB(302,63,99)
+    return math.floor(serpia_r),math.floor(serpia_g),math.floor(serpia_b)
+
+def converter_serpia(img,salvar):
+    imagem_original = Image.open(img)
+    imagem_cinza = Image.new('RGB',(imagem_original.width,imagem_original.height))
+    nova_imagem = ImageDraw.Draw(imagem_cinza)
+    for linha in range(imagem_original.height):
+        for coluna in range(imagem_original.width):
+            r,g,b = imagem_original.getpixel((linha,coluna))
+            nova_imagem.point((linha,coluna),fill=serpia(r,g,b))
+
+    imagem_cinza.save(salvar)
+# converter_serpia("mulher.tif","serpia.tif")
