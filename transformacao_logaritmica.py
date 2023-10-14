@@ -1,14 +1,13 @@
 from PIL import Image
 import numpy;
-from numpy import asarray;
-import retornarPath
+import numpy as np;
 
-def transformacao_logaritmica(string):
+def transformacao_logaritmica(string,salvar):
     img = Image.open(string)
-    data = asarray(img)
-    c = 255 / numpy.log(1 + numpy.max(data))
-    s = c * numpy.log(1+data)
-    s = s.astype(numpy.uint8)
-    img2 = Image.fromarray(s)
+    data = np.array(img)
+    c = 255 / numpy.log(1 + numpy.max(numpy.max(data)))
+    nova_imagem = (c * numpy.log(1+data)).astype(np.uint8)
+    img2 = Image.fromarray(nova_imagem)
     img.close()
-    return retornarPath.path(string,img2)
+    img2.save(salvar)
+    img2.close()

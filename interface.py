@@ -2,14 +2,21 @@ from tkinter import *
 from tkinter import simpledialog
 from tkinter import filedialog
 from tkinter import messagebox
-from tkinter import Canvas, Scrollbar
 from PIL import Image, ImageTk
+from tkinter import ttk
+import numpy as np
+import os
 import matplotlib.pyplot as plt
 import negativo
 import correcao_gamma
 import transformcao_logaritmica
 import histograma
 import nome_complicado
+import limearizacao
+import linear
+import filtro
+
+caminho_modificado = os.getcwd()  + "\modificado.tif"
 
 class Application:
 
@@ -21,6 +28,8 @@ class Application:
         self.frame_superior.pack(fill="x",side='top')
         self.bt_abrir_imagem = Button(self.frame_superior, width=10, height=1, compound="c", text="Abrir imagem", command=lambda:self.abrir_imagem())
         self.bt_abrir_imagem.pack(side='left', padx=5,pady=5)
+        self.bt_salvar_imagem = Button(self.frame_superior, width=10, height=1, compound="c", text="Salvar imagem", command=lambda:self.salvar_imagem())
+        self.bt_salvar_imagem.pack(side='left', padx=5,pady=5)
 
         # self.frame1 = Frame(self.root)
         # self.frame1.place(relx= 0.181, rely= 0.037, relwidth= 1, relheight= 0.97)
@@ -51,7 +60,7 @@ class Application:
         self.bt5 = Button(self.frame3, width=30, height=1, compound="c", text="Equalizar por Histograma", command=lambda:aplicar_equalizar_histograma(self,self.Path_img))
         self.bt5.grid(row=5,column=0,ipadx = 5, ipady= 5 )
         
-        self.bt6 = Button(self.frame3, width=30, height=1, compound="c", text="Filtro",)
+        self.bt6 = Button(self.frame3, width=30, height=1, compound="c", text="Limearização", command=lambda:aplicar_Limiar(self,self.Path_img))
         self.bt6.grid(row=6,column=0,ipadx = 5, ipady= 5 )
         
         self.bt7 = Button(self.frame3, width=30, height=1, compound="c", text="Aplicar Esteganografia", command=lambda:aplicar_Esteganografia(self.Path_img, self.text_area))
@@ -60,10 +69,18 @@ class Application:
         self.bt7 = Button(self.frame3, width=30, height=1, compound="c", text="Ler Esteganografia", command=lambda:ler_Esteganografia(self.Path_img, self.text_area))
         self.bt7.grid(row=8,column=0,ipadx = 5, ipady= 5 )
         
-        self.text_area = Text(self.root)
+        self.bt8 = Button(self.frame3, width=30, height=1, compound="c", text="Linear definido por partes", command=lambda:aplicar_linear(self,self.Path_img))
+        self.bt8.grid(row=9,column=0,ipadx = 5, ipady= 5 )
+        
+        self.bt9 = Button(self.frame3, width=30, height=1, compound="c", text="Filtros", command=lambda:aplicar_filtros(self,self.Path_img))
+        self.bt9.grid(row=9,column=0,ipadx = 5, ipady= 5 )
+
+        self.frame_aux = Frame(root)
+        self.frame_aux.pack(fill=BOTH,expand=True,padx=5,pady=5)
+        self.text_area = Text(self.frame_aux)
         # self.frame_text.pack()
         # text_area = Text(self.frame_text, wrap = WORD, height=8, width=30)
-        self.text_area.pack(fill=BOTH,expand=True,padx=5,pady=5)
+        self.text_area.pack(fill=BOTH,expand=True)
 
         # self.frame3.grid_rowconfigure(0, weight=1)
         # self.frame3.grid_columnconfigure(0, weight=1)
@@ -74,7 +91,8 @@ class Application:
         self.img = None
         self.label_img = None
         self.Top_level = None
-
+        self.colorido = None
+    
     def tela(self):
         self.root.title("Editor de Imagens")
         self.root.configure(background = "#1A1A1A")
@@ -95,13 +113,21 @@ class Application:
         self.Top_level = None
 
     def display_image(self,path):
+        imagem = Image.open(path)
         if self.Top_level:
             self.label_img.config(image="")  # Fechar a imagem anterior
             self.img = None
         else:
             self.Top_level = Toplevel(self.root)  # Cria uma nova janela sobre a janela principal
             self.Top_level.title("Imagem")
-        imagem = Image.open(path)
+            imagem.save(caminho_modificado)
+        if imagem.mode != 'RGB' or imagem.mode != 'HSV':
+            self.colorido = 'cinza'
+        else:
+            if imagem.mode == 'RGB':
+                self.colorido = 'RGB'
+            else:
+                self.colorido = 'HSV'
         self.img = ImageTk.PhotoImage(imagem)
         # self.nova_janela(self.img)
         largura,altura = imagem.size
@@ -133,57 +159,88 @@ class Application:
         label.pack()
     
     def abrir_imagem(self):
-        caminho_imagem = filedialog.askopenfilename(title="Selecione uma Imagem", filetypes=[("Imagens", "*.jpg *.png *.jpeg *.tif *.tiff")])
+        caminho_imagem = filedialog.askopenfilename(title="Selecione uma Imagem", filetypes=[("Imagens", "*.jpg *.png *.jpeg *.tif *.tiff *.bmp")])
         self.Path_img_normal = caminho_imagem
         if caminho_imagem:
             self.display_image(caminho_imagem)
 
+    def salvar_imagem(self):
+        if self.Path_img_normal:
+            file_path = filedialog.asksaveasfilename(defaultextension=".png",filetypes=[("Imagens", "*.jpg *.png *.jpeg *.tif *.tiff *.bmp")])
+            imagem = Image.open("modificado.tif")
+            imagem.save(file_path)
+        else:
+            messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
+
 def aplicar_negativo(tela,Path_img):
     if Path_img:
-        path = negativo.inverter(Path_img)
-        Application.display_image(tela,path)
+        negativo.inverter(Path_img,caminho_modificado)
+        Application.display_image(tela,caminho_modificado)
     else:
         messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
-        
-def pergunta():
-    resposta = simpledialog.askfloat("Valor de gamma","Insira o valor de gamma")
-    return resposta
+
+def pergunta_gamma():
+    try:
+        resposta = simpledialog.askfloat("Valor","Insira o valor do gamma")
+        return resposta
+    except:
+        return None
 
 def aplicar_gamma(tela,Path_img):
     if Path_img:
-        gamma = pergunta()
-        path = correcao_gamma.gamma(Path_img,gamma)
-        Application.display_image(tela,path)
+        gamma = pergunta_gamma()
+        if gamma is not None:
+            correcao_gamma.gamma(Path_img,gamma,caminho_modificado)
+            Application.display_image(tela,caminho_modificado)
     else:
         messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
 
 def aplicar_transformacao_logaritmica(tela,Path_img):
     if Path_img:
-        path = transformcao_logaritmica.transformacao_logaritmica(Path_img)
-        Application.display_image(tela,path)
+        transformcao_logaritmica.transformacao_logaritmica(Path_img,caminho_modificado)
+        Application.display_image(tela,caminho_modificado)
     else:
         messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
 
 def aplicar_histograma(Path_img):
     if Path_img:
-        histograma.histograma(Path_img)
+        histograma.histograma(caminho_modificado)
     else:
         messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
     
 def aplicar_equalizar_histograma(tela,Path_img):
     if Path_img:
-        path,contagem_pixel = histograma.histograma_equalizado(Path_img)
-        Application.display_image(tela,path)
+        contagem_pixel = histograma.histograma_equalizado(Path_img,caminho_modificado)
+        Application.display_image(tela,caminho_modificado)
         plt.plot(range(0,256),contagem_pixel)
         plt.show()
+    else:
+        messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
 
+def pergunta_limiar():
+    try:
+        resposta = simpledialog.askinteger("Valor","Insira o valor do Limiar")
+        if resposta > 255 or resposta < 0:
+            messagebox.showinfo("Alerta","Valor informado deve estar entre 0 e 255")
+            return None
+        return resposta
+    except:
+        messagebox.showinfo("Alerta","Valor informado é inválido")
+        return None
+
+def aplicar_Limiar(tela,Path_img):
+    if Path_img:
+        valor = pergunta_limiar()
+        if valor is not None:
+            limearizacao.limearizar(Path_img,valor)
+            Application.display_image(tela,caminho_modificado)
     else:
         messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
 
 def aplicar_Esteganografia(Path_img, informacoes):
     if Path_img:
         mensagem = informacoes.get("1.0","end-1c")
-        nome_complicado.hide_message(Path_img,mensagem,"modificado_escondido.tif")
+        nome_complicado.hide_message(Path_img,mensagem)
     else:
         messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
 
@@ -194,6 +251,112 @@ def ler_Esteganografia(Path_img, text):
         text.insert("1.0", mensagem)
     else:
         messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
+
+def aplicar_linear(tela,Path_img):
+    if Path_img:
+        linear.linearizar(Path_img,caminho_modificado)
+        Application.display_image(tela,caminho_modificado)
+    else:
+        messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
+
+def aplicar_filtros(tela,Path_img):
+    global matrix_kernel
+    matrix_kernel = None
+    def escolher_tamanho():
+        resposta = simpledialog.askinteger("Valor","Insira o tamanho da matriz (máximo 9)")
+        if resposta > 9 or resposta < 0:
+            messagebox.showinfo("Alerta","Valor inserido é invalido")
+            return None
+        else:
+            return resposta
+
+    def definir_kernel(tamanho,janela):
+        matrix = []
+        janela.title("Digite a Matriz")
+        for i in range(tamanho):
+            linha = []
+            for j in range(tamanho):
+                entry= ttk.Entry(janela)
+                entry.grid(row=i,column=j)
+                linha.append(entry)
+            matrix.append(linha)
+        botao = ttk.Button(janela, text="Salvar Matriz", command=lambda:enviar_conteudo_matriz(matrix,janela))
+        botao.grid(row=tamanho, columnspan=tamanho)
+    
+    def enviar_conteudo_matriz(matrix,janela):
+        global matrix_kernel
+        matrix_kernel=[]
+        for linha in matrix:
+            valores_linhas = []
+            for entry in linha:
+                valor = int(entry.get())
+                valores_linhas.append(valor)
+            #  = [entry.get() for entry in linha]
+            matrix_kernel.append(np.array(valores_linhas))
+        janela.destroy()
+        matrix_kernel = np.array(matrix_kernel)
+        filtro.convolucao(Path_img,matrix_kernel,caminho_modificado)
+        Application.display_image(tela,caminho_modificado)
+
+    def escolha():
+        opecao_selecionada = opcao.get()
+        if opecao_selecionada == "Generico":
+            resposta = escolher_tamanho()
+            for widget in top_level.winfo_children():
+                widget.destroy()
+            definir_kernel(resposta,top_level)
+        else:
+            if opecao_selecionada == "simples":
+                pass
+                # filtro.me
+            if opecao_selecionada == "ponderada":
+                pass
+            if opecao_selecionada == "mediana":
+                resposta = escolher_tamanho()
+                if resposta is not None:
+                    filtro.convoluca_mediana(Path_img,resposta,caminho_modificado)
+            if opecao_selecionada == "ponderada":
+                pass
+            if opecao_selecionada == "laplaciano":
+                filtro.laplaciano(Path_img,caminho_modificado)
+            if opecao_selecionada == "high":
+                filtro.high_bost(Path_img,caminho_modificado)
+            if opecao_selecionada == "x":
+                img = filtro.sorbel_x(Path_img)
+                img.save(caminho_modificado)
+            if opecao_selecionada == "y":
+                img = filtro.sorbel_y(Path_img)
+                img.save(caminho_modificado)
+            if opecao_selecionada == "magnitude":
+                filtro.sorbel(Path_img,caminho_modificado)
+            Application.display_image(tela,caminho_modificado)
+            top_level.destroy()
+
+    top_level = Toplevel()
+    top_level .title("Selecione uma opção")
+    opcao = StringVar()
+
+    op_1 = ttk.Radiobutton(top_level, text="Filtro Genérico", variable=opcao, value="Generico")
+    op_2 = ttk.Radiobutton(top_level, text="Filtro de suavização média simples", variable=opcao, value="simples")
+    op_3 = ttk.Radiobutton(top_level, text="Filtro de suavização média ponderada", variable=opcao, value="ponderada")
+    op_4 = ttk.Radiobutton(top_level, text="Filtro de mediana", variable=opcao, value="mediana")
+    op_5 = ttk.Radiobutton(top_level, text="Filtro de Laplaciano", variable=opcao, value="laplaciano")
+    op_6 = ttk.Radiobutton(top_level, text="Filtro de High-Boost", variable=opcao, value="high")
+    op_7 = ttk.Radiobutton(top_level, text="Filtro de sobel x", variable=opcao, value="x")
+    op_8 = ttk.Radiobutton(top_level, text="Filtro de sobel y", variable=opcao, value="y")
+    op_9 = ttk.Radiobutton(top_level, text="Filtro de bordas pelo gradiente", variable=opcao, value="magnitude")
+    op_1.pack()
+    op_2.pack()
+    op_3.pack()
+    op_4.pack()
+    op_5.pack()
+    op_6.pack()
+    op_7.pack()
+    op_8.pack()
+    op_9.pack()
+
+    show_button = ttk.Button(top_level, text="Escolher", command=lambda:escolha())
+    show_button.pack()
 
 root = Tk()
 Application(root)
