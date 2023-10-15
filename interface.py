@@ -7,14 +7,17 @@ from tkinter import ttk
 import numpy as np
 import os
 import matplotlib.pyplot as plt
+import re
 import negativo
 import correcao_gamma
 import transformacao_logaritmica
 import histograma
-import nome_complicado
+import esteganografia
 import limearizacao
 import linear
 import filtro
+import conversao
+import ajustes
 
 caminho_modificado = os.getcwd()  + "\modificado.tif"
 
@@ -74,6 +77,30 @@ class Application:
         
         self.bt9 = Button(self.frame3, width=30, height=1, compound="c", text="Filtros", command=lambda:aplicar_filtros(self,self.Path_img))
         self.bt9.grid(row=9,column=0,ipadx = 5, ipady= 5 )
+
+        self.bt10 = Button(self.frame3, width=30, height=1, compound="c", text="Escala de cinza simples", command=lambda:aplicar_converter_escala_cinza_simples(self,self.Path_img))
+        self.bt10.grid(row=9,column=0,ipadx = 5, ipady= 5 )
+        
+        self.bt11 = Button(self.frame3, width=30, height=1, compound="c", text="Escala de cinza ponderado", command=lambda:aplicar_converter_escala_cinza_ponderado(self,self.Path_img))
+        self.bt11.grid(row=9,column=0,ipadx = 5, ipady= 5 )
+
+        self.bt12 = Button(self.frame3, width=30, height=1, compound="c", text="Ajustes", command=lambda:aplicar_ajustes(self,self.Path_img))
+        self.bt12.grid(row=9,column=0,ipadx = 5, ipady= 5 )
+
+        self.bt13 = Button(self.frame3, width=30, height=1, compound="c", text="Sepia", command=lambda:aplicar_sepia(self,self.Path_img))
+        self.bt13.grid(row=9,column=0,ipadx = 5, ipady= 5 )
+
+        self.bt14 = Button(self.frame3, width=30, height=1, compound="c", text="Chroma-key", command=None)
+        self.bt14.grid(row=9,column=0,ipadx = 5, ipady= 5 )
+
+        self.bt15 = Button(self.frame3, width=30, height=1, compound="c", text="Rotação", command=None)
+        self.bt15.grid(row=9,column=0,ipadx = 5, ipady= 5 )
+
+        self.bt16 = Button(self.frame3, width=30, height=1, compound="c", text="Escala", command=None)
+        self.bt16.grid(row=9,column=0,ipadx = 5, ipady= 5 )
+
+        self.bt17 = Button(self.frame3, width=30, height=1, compound="c", text="Fourier", command=None)
+        self.bt17.grid(row=9,column=0,ipadx = 5, ipady= 5 )
 
         self.frame_aux = Frame(root)
         self.frame_aux.pack(fill=BOTH,expand=True,padx=5,pady=5)
@@ -240,13 +267,13 @@ def aplicar_Limiar(tela,Path_img):
 def aplicar_Esteganografia(Path_img, informacoes):
     if Path_img:
         mensagem = informacoes.get("1.0","end-1c")
-        nome_complicado.hide_message(Path_img,mensagem)
+        esteganografia.hide_message(Path_img,mensagem)
     else:
         messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
 
 def ler_Esteganografia(Path_img, text):
     if Path_img:
-        mensagem = nome_complicado.extract_and_display_message(Path_img)
+        mensagem = esteganografia.extract_and_display_message(Path_img)
         text.delete("1.0", END)
         text.insert("1.0", mensagem)
     else:
@@ -329,6 +356,10 @@ def aplicar_filtros(tela,Path_img):
                 img.save(caminho_modificado)
             if opecao_selecionada == "magnitude":
                 filtro.sorbel(Path_img,caminho_modificado)
+            if opecao_selecionada == "suavizacao":
+                filtro.suavizacao_rgb(Path_img,caminho_modificado)
+            if opecao_selecionada == "agucamento":
+                filtro.agucamento_rgb(Path_img,caminho_modificado)
             Application.display_image(tela,caminho_modificado)
             top_level.destroy()
 
@@ -345,6 +376,8 @@ def aplicar_filtros(tela,Path_img):
     op_7 = ttk.Radiobutton(top_level, text="Filtro de sobel x", variable=opcao, value="x")
     op_8 = ttk.Radiobutton(top_level, text="Filtro de sobel y", variable=opcao, value="y")
     op_9 = ttk.Radiobutton(top_level, text="Filtro de bordas pelo gradiente", variable=opcao, value="magnitude")
+    op_10 = ttk.Radiobutton(top_level, text="Filtro de suavizacao em RGB", variable=opcao, value="suavizacao")
+    op_11 = ttk.Radiobutton(top_level, text="Filtro de agucamento em RGB", variable=opcao, value="agucamento")
     op_1.pack()
     op_2.pack()
     op_3.pack()
@@ -354,10 +387,61 @@ def aplicar_filtros(tela,Path_img):
     op_7.pack()
     op_8.pack()
     op_9.pack()
+    op_10.pack()
+    op_11.pack()
 
     show_button = ttk.Button(top_level, text="Escolher", command=lambda:escolha())
     show_button.pack()
 
+def aplicar_converter_escala_cinza_simples(tela,Path_img):
+    if Path_img:
+        conversao.converter_escala_cinza(Path_img,caminho_modificado)
+        Application.display_image(tela,caminho_modificado)
+    else:
+        messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
+
+def validar_numero(numero):
+    pattern = r'^[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?$'
+    return re.match(pattern, numero)
+
+def submeter(peso1,peso2,peso3,tela,Path_img,janela):
+    if validar_numero(peso1) and validar_numero(peso2) and validar_numero(peso3):
+        conversao.converter_escala_cinza_ponderada(Path_img,caminho_modificado,peso1,peso2,peso3)
+        Application.display_image(tela,caminho_modificado)
+        janela.destroy()
+    else:
+        messagebox.showinfo("Alerta","Pelo menos 1 número é inválido")
+def aplicar_converter_escala_cinza_ponderado(tela,Path_img):
+    if Path_img:
+        janela = Toplevel()
+        janela .title("informe os pesos")
+        peso1 = Entry(janela)
+        peso2 = Entry(janela)
+        peso3 = Entry(janela)
+        peso1.pack()
+        peso2.pack()
+        peso3.pack()
+        botao = Button(janela, text="Submeter", command=lambda:submeter(peso1.get(),peso2.get(),peso3.get(),tela,Path_img,janela))
+        botao.pack()
+    else:
+        messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
+
+def aplicar_ajustes(tela,Path_img):
+    if Path_img:
+        linear.linearizar(Path_img,caminho_modificado)
+        Application.display_image(tela,caminho_modificado)
+    else:
+        messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
+
+def aplicar_sepia(tela,Path_img):
+    if Path_img:
+        conversao.converter_serpia(Path_img,caminho_modificado)
+        Application.display_image(tela,caminho_modificado)
+    else:
+        messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
+
 root = Tk()
 Application(root)
 root.mainloop()
+
+
