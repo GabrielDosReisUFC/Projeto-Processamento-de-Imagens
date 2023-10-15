@@ -56,6 +56,17 @@ def histograma_equalizado(file_path,salvar):
     img2.close()
     return contagem_equalizada
 
+def histograma_intensidade(img):
+    imagem = converter_RGB_HSV(img)
+    contagem_pixel_intensiade = [0]*101
+    for linha in range(imagem.height):
+        for coluna in range(imagem.width):
+            H,S,I = imagem.getpixel((coluna,linha))
+            contagem_pixel_intensiade[I] += 1
+
+    # plt.plot(range(0,101),contagem_pixel_intensiade)
+    # plt.show()
+    return contagem_pixel_intensiade
 
 def histograma_rgb(file_path):
     imagem_original = Image.open(file_path)  
@@ -65,49 +76,45 @@ def histograma_rgb(file_path):
 
     for linha in range(imagem_original.height):
         for coluna in range(imagem_original.width):
-            r,g,b = imagem_original.getpixel((linha,coluna))
+            r,g,b = imagem_original.getpixel((coluna,linha))
             contagem_pixel_r[r] += 1
             contagem_pixel_g[g] += 1
             contagem_pixel_b[b] += 1
 
+    contagem_I = histograma_intensidade(file_path)
+
     plt.figure(figsize=(12,4))
-    plt.subplot(131)
+    plt.subplot(141)
     plt.title('Histograma de R')
     plt.xlabel('Pixels')
     plt.ylabel('intensidade')
     plt.plot(range(0,256),contagem_pixel_r)
     
-    plt.subplot(132)
+    plt.subplot(142)
     plt.title('Histograma de G')
     plt.xlabel('Pixels')
     plt.ylabel('intensidade')
     plt.plot(range(0,256),contagem_pixel_g)
 
-    plt.subplot(133)
+    plt.subplot(143)
     plt.title('Histograma de B')
     plt.xlabel('Pixels')
     plt.ylabel('intensidade')
     plt.plot(range(0,256),contagem_pixel_b)
+    
+    plt.subplot(144)
+    plt.title('Histograma de I')
+    plt.xlabel('Pixels')
+    plt.ylabel('intensidade')
+    plt.plot(range(0,101),contagem_I)
 
     plt.tight_layout()
     plt.show()
 
-def histograma_intensidade(img):
-    imagem = converter_RGB_HSV(img)
-    contagem_pixel_intensiade = [0]*101
-    for linha in range(imagem.height):
-        for coluna in range(imagem.width):
-            H,S,I = imagem.getpixel((linha,coluna))
-            contagem_pixel_intensiade[I] += 1
-
-    # plt.plot(range(0,101),contagem_pixel_intensiade)
-    # plt.show()
-    return contagem_pixel_intensiade
-
 # histograma_rgb("mulher.tif")
 # histograma_intensidade("mulher.tif")
 
-def equalizar_intensidade(img):
+def equalizar_intensidade(img,salvar):
     imagem = converter_RGB_HSV(img)    
     intensidade = np.array(imagem)[:,:,2]
     contagem_pixel = histograma_intensidade(img) 
@@ -126,5 +133,7 @@ def equalizar_intensidade(img):
     imagem_equalizada[:,:,2] = intensidade_normalizada * 255 / 100
 
     imagem_equalizada = Image.fromarray(imagem_equalizada, "RGB")
-    imagem_equalizada.save("imagem_equalizada.jpg")
+    imagem_equalizada.save(salvar)
+
+    return histograma_intensidade(salvar) 
 

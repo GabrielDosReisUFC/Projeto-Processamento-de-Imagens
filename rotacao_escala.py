@@ -3,6 +3,30 @@ import cv2
 import math as m 
 import sys
 
+img = cv2.imread(sys.argv[1])
+angle = sys.argv[2]
+
+def getRMat(cx, cy, angle, scale):
+    a = scale*m.cos(angle*np.pi/180)
+    b = scale*(m.sin(angle*np.pi/180))
+    u = (1-a)*cx-b*cy
+    v = b*cx+(1-a)*cy
+    return np.array([[a,b,u], [-b,a,v]]) 
+
+
+h, w = img.shape[:2]
+
+
+cx, cy = (w / 2, h / 2)
+
+mat = getRMat(cx, cy, int(angle), 1)
+cos = np.abs(mat[0,0])
+sin  = np.abs(mat[0,1])
+newWidth = int((h * sin) + (w * cos))
+newHeight = int((h * cos) + (w * sin))
+mat[0,2] += cx - (newWidth / 2)
+mat[1,2] += cy - (newHeight / 2)
+
 def warpAff2(image, matrix, width, height):
         dst = np.zeros((height, width, 3), dtype=np.uint8)
         oldh, oldw = image.shape[:2]
