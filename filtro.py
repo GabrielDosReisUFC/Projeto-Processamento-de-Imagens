@@ -28,7 +28,7 @@ def convolucao(img, kernel,salvar):
     # imga.show()
     imga.close()
 
-def convolicao_media(img,tam,salvar):
+def convolucao_media(img,tam,salvar):
     matrix = np.ones((tam,tam),dtype=int) * pow(tam,2)
     convolucao(img,matrix,salvar)
 
@@ -58,9 +58,6 @@ def convoluca_mediana(path, tam,salvar):
 def laplaciano(img,salvar):
     image = Image.open(img)
     kernel = np.array([[0, 1, 0], [1, -4, 1,], [0, 1, 0]])
-    # kernel2 = np.array([[1, 1, 1], [1, -8, 1,], [1, 1, 1]])
-    # kernel3 = kernel*(-1)
-    # kernel4 = kernel2*(-1)
      
     width, height = image.size
     kernel_width, kernel_height = kernel.shape
@@ -166,7 +163,7 @@ def sorbel(img,salvar):
     # nova_imga.show()
     nova_imga.save(salvar)
     
-def convolucao_rgb(img, kernel):
+def convolucao_rgb(img, kernel,salvar):
     image = Image.open(img)
     width, height = image.size
     kernel_width, kernel_height = kernel.shape
@@ -185,8 +182,8 @@ def convolucao_rgb(img, kernel):
                     if (x + i >= 0 and x + i < width) and (y + j >= 0 and y + j < height):
                       r,g,b = image.getpixel((x + i, y + j))
                       accumulator_r += math.floor(r * kernel[i + padding, j + padding])
-                      accumulator_g += math.floor(r * kernel[i + padding, j + padding])
-                      accumulator_b += math.floor(r * kernel[i + padding, j + padding])
+                      accumulator_g += math.floor(g * kernel[i + padding, j + padding])
+                      accumulator_b += math.floor(b * kernel[i + padding, j + padding])
             pixels_suavizados[x,y] = (accumulator_r,accumulator_g,accumulator_b)
 
     # imga_array = np.array(imagem_suavizada)
@@ -194,13 +191,14 @@ def convolucao_rgb(img, kernel):
     # imga_normalizada = Image.fromarray(imga_array/np.max(np.max(np.max(imga_array)))* 255).astype(np.uint8)
     # imga = Image.fromarray(imga_normalizada)
     # imga.show()
-    imagem_suavizada.show()
+    imagem_suavizada.save(salvar)
 
-def suavizacao_rgb(img):
+def suavizacao_rgb(img,salvar):
     kernel = np.array([[1, 1, 1], [1, 1, 1,], [1, 1, 1]])*1/9
-    convolucao_rgb(img,kernel)
+    convolucao_rgb(img,kernel,salvar)
 
-def agucamento_rgb(img):
+def agucamento_rgb(img,salvar):
     kernel = np.array([[-1, -1, -1], [-1, 9, -1,], [-1, -1, -1]])
-    convolucao_rgb(img,kernel)
+    convolucao_rgb(img,kernel,salvar)
 
+# agucamento_rgb("mulher.tif","modificado.tif")
