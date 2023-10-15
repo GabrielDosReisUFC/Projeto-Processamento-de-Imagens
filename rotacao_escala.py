@@ -3,8 +3,8 @@ import cv2
 import math as m 
 import sys
 
-img = cv2.imread(sys.argv[1])
-angle = sys.argv[2]
+img = cv2.imread("mulher.tif")
+angle = 90
 
 def getRMat(cx, cy, angle, scale):
     a = scale*m.cos(angle*np.pi/180)
