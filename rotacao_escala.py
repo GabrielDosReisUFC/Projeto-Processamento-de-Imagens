@@ -6,7 +6,6 @@ import sys
 img = cv2.imread(sys.argv[1])
 angle = sys.argv[2]
 
-#get rotation matrix
 def getRMat(cx, cy, angle, scale):
     a = scale*m.cos(angle*np.pi/180)
     b = scale*(m.sin(angle*np.pi/180))
@@ -14,10 +13,10 @@ def getRMat(cx, cy, angle, scale):
     v = b*cx+(1-a)*cy
     return np.array([[a,b,u], [-b,a,v]]) 
 
-#determine shape of img
+
 h, w = img.shape[:2]
-#print h, w
-#determine center of image
+
+
 cx, cy = (w / 2, h / 2)
 
 mat = getRMat(cx, cy, int(angle), 1)
