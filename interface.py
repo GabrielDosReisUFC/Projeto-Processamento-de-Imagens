@@ -54,7 +54,7 @@ class Application:
         self.bt2 = Button(self.frame3, width=30, height=1, compound="c", text="Transformação Logarítmica", command=lambda:aplicar_transformacao_logaritmica(self,self.Path_img))
         self.bt2.grid(row=2,column=0,ipadx = 5, ipady= 5 )
         
-        self.bt3 = Button(self.frame3, width=30, height=1, compound="c", text="Nomal", command=lambda:self.normal(self.Path_img_normal))
+        self.bt3 = Button(self.frame3, width=30, height=1, compound="c", text="Normal", command=lambda:self.normal(self.Path_img_normal))
         self.bt3.grid(row=3,column=0,ipadx = 5, ipady= 5 )
         
         self.bt4 = Button(self.frame3, width=30, height=1, compound="c", text="Histograma", command=lambda:aplicar_histograma(self.Path_img_normal))
@@ -81,13 +81,13 @@ class Application:
         self.bt10 = Button(self.frame3, width=30, height=1, compound="c", text="Escala de cinza simples", command=lambda:aplicar_converter_escala_cinza_simples(self,self.Path_img))
         self.bt10.grid(row=9,column=0,ipadx = 5, ipady= 5 )
         
-        self.bt11 = Button(self.frame3, width=30, height=1, compound="c", text="Escala de cinza ponderado", command=lambda:aplicar_converter_escala_cinza_ponderado(self,self.Path_img))
+        self.bt11 = Button(self.frame3, width=30, height=1, compound="c", text="Escala de cinza ponderada", command=lambda:aplicar_converter_escala_cinza_ponderado(self,self.Path_img))
         self.bt11.grid(row=9,column=0,ipadx = 5, ipady= 5 )
 
         self.bt12 = Button(self.frame3, width=30, height=1, compound="c", text="Ajustes", command=lambda:aplicar_ajustes(self,self.Path_img))
         self.bt12.grid(row=9,column=0,ipadx = 5, ipady= 5 )
 
-        self.bt13 = Button(self.frame3, width=30, height=1, compound="c", text="Sepia", command=lambda:aplicar_sepia(self,self.Path_img))
+        self.bt13 = Button(self.frame3, width=30, height=1, compound="c", text="Sépia", command=lambda:aplicar_sepia(self,self.Path_img))
         self.bt13.grid(row=9,column=0,ipadx = 5, ipady= 5 )
 
         self.bt14 = Button(self.frame3, width=30, height=1, compound="c", text="Chroma-key", command=None)
@@ -292,7 +292,7 @@ def aplicar_filtros(tela,Path_img):
     def escolher_tamanho():
         resposta = simpledialog.askinteger("Valor","Insira o tamanho da matriz (máximo 9)")
         if resposta > 9 or resposta < 0:
-            messagebox.showinfo("Alerta","Valor inserido é invalido")
+            messagebox.showinfo("Alerta","Valor inserido é inválido")
             return None
         else:
             return resposta
@@ -326,39 +326,39 @@ def aplicar_filtros(tela,Path_img):
         Application.display_image(tela,caminho_modificado)
 
     def escolha():
-        opecao_selecionada = opcao.get()
-        if opecao_selecionada == "Generico":
+        opcao_selecionada = opcao.get()
+        if opcao_selecionada == "Genérico":
             resposta = escolher_tamanho()
             for widget in top_level.winfo_children():
                 widget.destroy()
             definir_kernel(resposta,top_level)
         else:
-            if opecao_selecionada == "simples":
+            if opcao_selecionada == "simples":
                 pass
                 # filtro.me
-            if opecao_selecionada == "ponderada":
+            if opcao_selecionada == "ponderada":
                 pass
-            if opecao_selecionada == "mediana":
+            if opcao_selecionada == "mediana":
                 resposta = escolher_tamanho()
                 if resposta is not None:
                     filtro.convoluca_mediana(Path_img,resposta,caminho_modificado)
-            if opecao_selecionada == "ponderada":
+            if opcao_selecionada == "ponderada":
                 pass
-            if opecao_selecionada == "laplaciano":
+            if opcao_selecionada == "laplaciano":
                 filtro.laplaciano(Path_img,caminho_modificado)
-            if opecao_selecionada == "high":
+            if opcao_selecionada == "high":
                 filtro.high_bost(Path_img,caminho_modificado)
-            if opecao_selecionada == "x":
+            if opcao_selecionada == "x":
                 img = filtro.sorbel_x(Path_img)
                 img.save(caminho_modificado)
-            if opecao_selecionada == "y":
+            if opcao_selecionada == "y":
                 img = filtro.sorbel_y(Path_img)
                 img.save(caminho_modificado)
-            if opecao_selecionada == "magnitude":
+            if opcao_selecionada == "magnitude":
                 filtro.sorbel(Path_img,caminho_modificado)
-            if opecao_selecionada == "suavizacao":
+            if opcao_selecionada == "suavizacao":
                 filtro.suavizacao_rgb(Path_img,caminho_modificado)
-            if opecao_selecionada == "agucamento":
+            if opcao_selecionada == "aguçamento":
                 filtro.agucamento_rgb(Path_img,caminho_modificado)
             Application.display_image(tela,caminho_modificado)
             top_level.destroy()
@@ -373,8 +373,8 @@ def aplicar_filtros(tela,Path_img):
     op_4 = ttk.Radiobutton(top_level, text="Filtro de mediana", variable=opcao, value="mediana")
     op_5 = ttk.Radiobutton(top_level, text="Filtro de Laplaciano", variable=opcao, value="laplaciano")
     op_6 = ttk.Radiobutton(top_level, text="Filtro de High-Boost", variable=opcao, value="high")
-    op_7 = ttk.Radiobutton(top_level, text="Filtro de sobel x", variable=opcao, value="x")
-    op_8 = ttk.Radiobutton(top_level, text="Filtro de sobel y", variable=opcao, value="y")
+    op_7 = ttk.Radiobutton(top_level, text="Filtro de Sobel x", variable=opcao, value="x")
+    op_8 = ttk.Radiobutton(top_level, text="Filtro de Sobel y", variable=opcao, value="y")
     op_9 = ttk.Radiobutton(top_level, text="Filtro de bordas pelo gradiente", variable=opcao, value="magnitude")
     op_10 = ttk.Radiobutton(top_level, text="Filtro de suavizacao em RGB", variable=opcao, value="suavizacao")
     op_11 = ttk.Radiobutton(top_level, text="Filtro de agucamento em RGB", variable=opcao, value="agucamento")
