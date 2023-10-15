@@ -90,10 +90,10 @@ class Application:
         self.bt13 = Button(self.frame3, width=30, height=1, compound="c", text="Sépia", command=lambda:aplicar_sepia(self,self.Path_img))
         self.bt13.grid(row=9,column=0,ipadx = 5, ipady= 5 )
 
-        self.bt14 = Button(self.frame3, width=30, height=1, compound="c", text="Chroma-key", command=None)
+        self.bt14 = Button(self.frame3, width=30, height=1, compound="c", text="Chroma-key", command=lambda:aplicar_chroma(self,self.Path_img, self.Path_img_2))
         self.bt14.grid(row=9,column=0,ipadx = 5, ipady= 5 )
 
-        self.bt15 = Button(self.frame3, width=30, height=1, compound="c", text="Rotação", command=None)
+        self.bt15 = Button(self.frame3, width=30, height=1, compound="c", text="Rotação", command=lambda:aplicar_rotacao(self, self.Path_img))
         self.bt15.grid(row=9,column=0,ipadx = 5, ipady= 5 )
 
         self.bt16 = Button(self.frame3, width=30, height=1, compound="c", text="Escala", command=None)
@@ -114,6 +114,7 @@ class Application:
         # self.frame3.grid_columnconfigure(1, weight=1)
 
         self.Path_img = None
+        self.Path_img_2 = None
         self.Path_img_normal = None
         self.img = None
         self.label_img = None
@@ -172,6 +173,7 @@ class Application:
             # self.label_img.place(relx = 0, rely= 0)
         
         self.Path_img = path
+        self.Path_img_2 = path2
 
     def normal(self,path):
         if self.Path_img:
@@ -283,6 +285,14 @@ def aplicar_linear(tela,Path_img):
     if Path_img:
         linear.linearizar(Path_img,caminho_modificado)
         Application.display_image(tela,caminho_modificado)
+    else:
+        messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
+
+def aplicar_chroma(tela,Path_img,Path_img2):
+    if Path_img:
+        valor = pergunta_limiar()
+        chroma.chromakey(img, imgfundo, valor)
+        
     else:
         messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
 
@@ -411,6 +421,7 @@ def submeter(peso1,peso2,peso3,tela,Path_img,janela):
         janela.destroy()
     else:
         messagebox.showinfo("Alerta","Pelo menos 1 número é inválido")
+
 def aplicar_converter_escala_cinza_ponderado(tela,Path_img):
     if Path_img:
         janela = Toplevel()
