@@ -356,7 +356,7 @@ def aplicar_filtros(tela,Path_img):
                 img.save(caminho_modificado)
             if opcao_selecionada == "magnitude":
                 filtro.sorbel(Path_img,caminho_modificado)
-            if opcao_selecionada == "suavizacao":
+            if opcao_selecionada == "suavização":
                 filtro.suavizacao_rgb(Path_img,caminho_modificado)
             if opcao_selecionada == "aguçamento":
                 filtro.agucamento_rgb(Path_img,caminho_modificado)
