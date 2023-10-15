@@ -128,4 +128,3 @@ def equalizar_intensidade(img):
     imagem_equalizada = Image.fromarray(imagem_equalizada, "RGB")
     imagem_equalizada.save("imagem_equalizada.jpg")
 
-equalizar_intensidade("mulher.tif")

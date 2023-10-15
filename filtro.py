@@ -204,4 +204,3 @@ def agucamento_rgb(img):
     kernel = np.array([[-1, -1, -1], [-1, 9, -1,], [-1, -1, -1]])
     convolucao_rgb(img,kernel)
 
-agucamento_rgb("mulher.tif")
