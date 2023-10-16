@@ -1,8 +1,12 @@
 import numpy as np
 from cmath import exp, pi
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import matplotlib.pyplot as plt
 
 #Transformada discreta ingênua de Fourier
-def DFT2D(f):
+def DFT2D(img, salvar):
+    imagem = plt.imread(img)
+    f = np.array(imagem)
     F = np.zeros(f.shape, dtype=np.complex64)
     n,m = f.shape[0:2]
     x = np.arange(n)
@@ -24,7 +28,7 @@ def IDFT2D(F):
                 f[x,y] += np.real(np.sum(F[:,v] * np.exp( (1j*2*np.pi) * (((u*x)/n)+((v*y)/m)) )))
     return np.real(f/np.sqrt(n*m))
 
-#Rápida
+#Rápida - recursiva divisão e conquista
 def FFT(f):
     N = len(f)
     if N <= 1:
@@ -34,24 +38,33 @@ def FFT(f):
     aux = np.zeros(N).astype(np.complex64)
     for u in range(N//2):
         aux[u] = par[u] + exp(-2j*pi*u/N) * impar[u] 
-        aux[u+N//2] = par[u] - exp(-2j*pi*u/N)*impar[u]  
-                
+        aux[u+N//2] = par[u] - exp(-2j*pi*u/N)*impar[u]              
     return aux
 
-def fftshift(x, axes=None):
-    x = asarray(x)
-    if axes is None:
-        axes = tuple(range(x.ndim))
-        shift = [dim // 2 for dim in x.shape]
-    elif isinstance(axes, integer_types):
-        shift = x.shape[axes] // 2
-    else:
-        shift = [x.shape[ax] // 2 for ax in axes]
+def plot_spectrum(F):
+    magnitude_spectrum = np.abs(F)
+    plt.imshow(np.log(1 + magnitude_spectrum), cmap='gray')
+    plt.title('Espectro')
+    plt.colorbar()
 
-    return roll(x, shift, axes)
+def edit_spectrum_with_brush(F, canvas):
+    def edit(event):
+        x, y = int(event.xdata), int(event.ydata)
+        radius = 5  # Tamanho do pincel
+        mask = np.zeros(F.shape)
+        for i in range(x - radius, x + radius + 1):
+            for j in range(y - radius, y + radius + 1):
+                if 0 <= i < F.shape[1] and 0 <= j < F.shape[0]:
+                    mask[j, i] = 1  # Define os pontos dentro do raio do pincel como 1
+        F *= (1 - mask)  # Inverte os pontos clicados de preto para branco
 
+        canvas.figure.clf()
+        plot_spectrum(F)
+        canvas.draw()
 
-def ffiltro(tamanho,img):
-    img_s = img[:tamanho, :tamanho]
-    Fs = DFT2D(img_s)
-    imshow(np.log(1 + fftshift(np.abs(Fs))))
+    return edit
+
+def apply_user_modifications(F):
+    modified_F = F  
+    filtered_image = IDFT2D(modified_F)  
+    return filtered_image

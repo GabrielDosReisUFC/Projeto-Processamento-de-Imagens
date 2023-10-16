@@ -1,8 +1,9 @@
-import conversao
+import rgb2hsv
 from PIL import Image,ImageDraw
 
 def ajuste_matiz(img,valor,salvar):
-    imagem_hsv = conversao.converter_RGB_HSV(img)
+    imagem = Image.open(img)
+    imagem_hsv = rgb2hsv.rgb2hsv(imagem)
     imagem_nova = Image.new('RGB',(imagem_hsv.width,imagem_hsv.height))
     nova_imagem = ImageDraw.Draw(imagem_nova)
     for linha in range(imagem_hsv.height):
@@ -15,19 +16,21 @@ def ajuste_matiz(img,valor,salvar):
     imagem_hsv.close()
 
 def ajuste_saturacao(img,valor,salvar):
-    imagem_hsv = conversao.converter_RGB_HSV(img)
+    imagem = Image.open(img)
+    imagem_hsv = rgb2hsv.rgb2hsv(imagem)
     imagem_nova = Image.new('RGB',(imagem_hsv.width,imagem_hsv.height))
     nova_imagem = ImageDraw.Draw(imagem_nova)
     for linha in range(imagem_hsv.height):
         for coluna in range(imagem_hsv.width):
             H,S,V = imagem_hsv.getpixel((coluna,linha))
-            nova_imagem.point((coluna,linha),fill=conversao.HSV_RGB(H,S+valor,V))
+            nova_imagem.point((coluna,linha),fill=rgb2hsv.hsv2rgb(H,S+valor,V))
     imagem_nova.save(salvar)
     imagem_hsv.close()
     imagem_nova.close()
 
 def ajuste_brilho(img,valor,salvar):
-    imagem_hsv = conversao.converter_RGB_HSV(img)
+    imagem = Image.open(img)
+    imagem_hsv = rgb2hsv.rgb2hsv(imagem)
     imagem_nova = Image.new('RGB',(imagem_hsv.width,imagem_hsv.height))
     nova_imagem = ImageDraw.Draw(imagem_nova)
     for linha in range(imagem_hsv.height):
@@ -38,7 +41,7 @@ def ajuste_brilho(img,valor,salvar):
             elif V+valor >= 100:
                 nova_imagem.point((coluna,linha),fill=conversao.HSV_RGB(H,S,100))
             else:
-                nova_imagem.point((coluna,linha),fill=conversao.HSV_RGB(H,S,V+valor))
+                nova_imagem.point((coluna,linha),fill=rgb2hsv.hsv2rgb(H,S,V+valor))
     imagem_nova.save(salvar)
     imagem_hsv.close()
     imagem_nova.close()
@@ -88,8 +91,10 @@ def ajuste_B(img,valor,salvar):
         for coluna in range(imagem.width):
             R,G,B = imagem.getpixel((coluna,linha))
             if B+valor <=0:
+
                 nova_imagem.point((coluna,linha),fill=(R,G,0))
             elif B+valor >= 255:
+
                 nova_imagem.point((coluna,linha),fill=(R,G,255))
             else:
                 nova_imagem.point((coluna,linha),fill=(R,G,B+valor))

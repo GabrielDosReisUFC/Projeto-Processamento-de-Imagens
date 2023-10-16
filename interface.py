@@ -18,7 +18,8 @@ import linear
 import filtro
 import conversao
 import ajustes
-import chroma
+import croma
+import rotacao_escala
 caminho_modificado = os.getcwd()  + "\modificado.tif"
 
 class Application:
@@ -76,7 +77,7 @@ class Application:
         self.bt12 = Button(self.frame3, width=30, height=1, compound="c", text="Sepia", command=lambda:aplicar_sepia(self,self.Path_img))
         self.bt12.grid(row=13,column=0,ipadx = 5, ipady= 5 )
 
-        self.bt13 = Button(self.frame3, width=30, height=1, compound="c", text="Chroma-key", command=lambda:aplicar_chroma(self,self.Path_img))
+        self.bt13 = Button(self.frame3, width=30, height=1, compound="c", text="Chroma key", command=lambda:aplicar_chroma(self,self.Path_img))
         self.bt13.grid(row=14,column=0,ipadx = 5, ipady= 5 )
 
         self.bt14 = Button(self.frame3, width=30, height=1, compound="c", text="Rotação", command=lambda:aplicar_rotacao(self,self.Path_img))
@@ -180,7 +181,7 @@ def aplicar_negativo(tela,Path_img,colorido):
         if colorido:
             negativo.negativo_RGB(Path_img,caminho_modificado)
         else:
-            negativo.negativo_simples(Path_img,caminho_modificado)
+            negativo.inverter(Path_img,caminho_modificado)
         Application.display_image(tela,caminho_modificado)
     else:
         messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
@@ -403,13 +404,13 @@ def aplicar_filtros(tela,Path_img,colorido):
     op_2 = ttk.Radiobutton(top_level, text="Filtro de suavização média simples", variable=opcao, value="simples")
     op_3 = ttk.Radiobutton(top_level, text="Filtro de suavização média ponderada", variable=opcao, value="ponderada")
     op_4 = ttk.Radiobutton(top_level, text="Filtro de mediana", variable=opcao, value="mediana")
-    op_5 = ttk.Radiobutton(top_level, text="Filtro de Laplaciano", variable=opcao, value="laplaciano")
+    op_5 = ttk.Radiobutton(top_level, text="Filtro Laplaciano", variable=opcao, value="laplaciano")
     op_6 = ttk.Radiobutton(top_level, text="Filtro de High-Boost", variable=opcao, value="high")
     op_7 = ttk.Radiobutton(top_level, text="Filtro de Sobel x", variable=opcao, value="x")
     op_8 = ttk.Radiobutton(top_level, text="Filtro de Sobel y", variable=opcao, value="y")
     op_9 = ttk.Radiobutton(top_level, text="Filtro de bordas pelo gradiente", variable=opcao, value="magnitude")
-    op_10 = ttk.Radiobutton(top_level, text="Filtro de suavizacao em RGB", variable=opcao, value="suavizacao")
-    op_11 = ttk.Radiobutton(top_level, text="Filtro de agucamento em RGB", variable=opcao, value="agucamento")
+    op_10 = ttk.Radiobutton(top_level, text="Filtro de suavização em RGB", variable=opcao, value="suavizacao")
+    op_11 = ttk.Radiobutton(top_level, text="Filtro de aguçamento em RGB", variable=opcao, value="agucamento")
     op_1.pack()
     op_2.pack()
     op_3.pack()
@@ -551,7 +552,19 @@ def aplicar_ajustes(tela,Path_img,colorido):
             botao = Button(janela, text="Selecionar", command=lambda:escolha_ajutes(tela,Path_img,janela,int(opcao.get())))
             botao.pack()
         else:
-            messagebox.showinfo("Alerta","Formato de imagem invalido")
+            messagebox.showinfo("Alerta","Formato de imagem inválido")
+    else:
+        messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
+
+def aplicar_chroma(tela,Path_img):
+    if Path_img:
+        if colorido:
+            valor = pergunta_limiar()
+            imgfundo = filedialog.askopenfilename(title="Selecione uma Imagem para background", filetypes=[("Imagens", "*.jpg *.png *.jpeg *.tif *.tiff *.bmp")])
+            chroma.chromakey(Path_img, imgfundo, valor,caminho_modificado)
+            Application.display_image(tela,caminho_modificado)
+        else:
+            messagebox.showinfo("Alerta","Formato de imagem inválido")
     else:
         messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
 
@@ -560,38 +573,67 @@ def aplicar_sepia(tela,Path_img,colorido):
         if colorido:
             messagebox.showinfo("Alerta","Formato inválido")
         else:
-            conversao.converter_serpia(Path_img,caminho_modificado)
+            conversao.converter_sepia(Path_img,caminho_modificado)
             Application.display_image(tela,caminho_modificado)
     else:
         messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
 
-def aplicar_chroma(tela,Path_img):
-    if Path_img:
-        valor = pergunta_limiar()
-        imgfundo = filedialog.askopenfilename(title="Selecione uma Imagem para background", filetypes=[("Imagens", "*.jpg *.png *.jpeg *.tif *.tiff *.bmp")])
-        chroma.chromakey(Path_img, imgfundo, valor)
-    else:
-        messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
+
+
 def aplicar_rotacao(tela,Path_img):
     if Path_img:
+        resposta = simpledialog.askinteger("Valor","Insira o valor do ângulo")
+        rotacao_escala.rotacao(Path_img,resposta,caminho_modificado)
         Application.display_image(tela,caminho_modificado)
     else:
         messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
+
+#Aplicar escala: menu para escolher linear ou nearest neighbour
+
+def escolha_escala(tela,Path_img,janela,opcao):
+    janela.destroy()
+    if opcao == 1:
+        # try:
+        resposta = simpledialog.askinteger("Valor","Insira um valor de escala")
+        rotacao_escala.interpolacao_nn(Path_img,resposta,caminho_modificado)
+        # except:
+            # messagebox.showinfo("Alerta","Você deve inserir um valor válido")
+    elif opcao == 2:
+        try:
+            resposta = simpledialog.askinteger("Valor","Insira um valor de escala")
+            rotacao_escala.interpolacao_lin(Path_img,resposta,caminho_modificado)
+        except:
+            messagebox.showinfo("Alerta","Você deve inserir um valor válido")
 
 def aplicar_escala(tela,Path_img):
     if Path_img:
+        janela = Toplevel()
+        janela .title("Selecione uma opção")
+        opcao = StringVar()
+        opcao1 = Radiobutton(janela, text="Vizinho mais próximo", variable=opcao, value="1")
+        opcao2 = Radiobutton(janela, text="Linear", variable=opcao, value="2")
+        opcao1.pack()
+        opcao2.pack()
+        botao = Button(janela, text="Selecionar", command=lambda:escolha_escala(tela,Path_img,janela,int(opcao.get())))
+        botao.pack()
         Application.display_image(tela,caminho_modificado)
     else:
         messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
 
+#Aplicar Fourier: rápida ou ingênua
 def aplicar_fourier(tela,Path_img):
     if Path_img:
+        janela = Toplevel()
+        janela .title("Selecione uma opção")
+        opcao = StringVar()
+        opcao1 = Button(janela, text="Transformada discreta", command=)
+        opcao2 = Button(janela, text="Transformada rápida", command=)
+        
         Application.display_image(tela,caminho_modificado)
     else:
         messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
 
+#main
 root = Tk()
 Application(root)
 root.mainloop()
-
-

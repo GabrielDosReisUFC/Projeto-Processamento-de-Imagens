@@ -1,39 +1,23 @@
-import cv2 
+from PIL import Image
 import numpy as np
-from PIL import Image,ImageDraw
 
-def chromakey(img, imgfundo, gthreshold):
+def chromakey(path,path2,valor,salvar):
+    img = Image.open(path)
+    img2 = Image.open(path2)
 
-    width = img.shape[1]
-    height = img.shape[0]
-    dim = (width ,height)
+    img_array = np.array(img)
+    img_array2 = np.array(img2)
 
-    im_b,im_g,im_r = cv2.split(img)
+    for i in range(img.height):
+        for j in range(img.width):
+            r,g,b = img_array[i,j]
+            if g < 255-valor:
+              # print(g)
+              if i < img2.height and j < img2.width:
+                  img_array[i,j] = img_array2[i,j]
 
-#Thresholder da imagem Green(G) e inversão da imagem com 'cv2.THRESH_BINARY_INV'
-    ret,im_thresh1 = cv2.threshold(im_g,255-gthreshold,255,cv2.THRESH_BINARY_INV)
+    img_final = Image.fromarray(img_array)
+    img_final.save(salvar)
+    
 
-    Im_RGB = cv2.cvtColor(im_thresh1,cv2.COLOR_GRAY2BGR)
-
-    im_noback = cv2.bitwise_and(Im_RGB, im)
-
-#converto para RGB o resultado e mostro a imagem resultante.
-    im_noback = cv2.cvtColor(im_noback,cv2.COLOR_BGR2RGB)
-
-
-# Convertendo para RGB a imagem.
-    z = cv2.cvtColor(imgfundo,cv2.COLOR_BGR2RGB)
-
-# Plotando a imagem de backround e redimencionando a imagem de back.
-
-    im_res = cv2.resize(z, dim, interpolation = cv2.INTER_AREA)
-
-# Invete a imagem do thresholder
-    im_iv = 255 - Im_RGB
-
-    im_z_nofront = cv2.bitwise_and(im_res, im_iv)
-
-# Soma da background com o frontend
-    im_final = im_z_nofront + im_noback
-    im_final.show()
 
