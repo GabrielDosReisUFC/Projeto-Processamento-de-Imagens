@@ -18,7 +18,8 @@ import linear
 import filtro
 import conversao
 import ajustes
-import chroma
+import croma
+import rotacao_escala
 caminho_modificado = os.getcwd()  + "\modificado.tif"
 
 class Application:
@@ -556,6 +557,18 @@ def aplicar_ajustes(tela,Path_img,colorido):
     else:
         messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
 
+def aplicar_chroma(tela,Path_img):
+    if Path_img:
+        if colorido:
+            valor = pergunta_limiar()
+            imgfundo = filedialog.askopenfilename(title="Selecione uma Imagem para background", filetypes=[("Imagens", "*.jpg *.png *.jpeg *.tif *.tiff *.bmp")])
+            chroma.chromakey(Path_img, imgfundo, valor,caminho_modificado)
+            Application.display_image(tela,caminho_modificado)
+        else:
+            messagebox.showinfo("Alerta","Formato de imagem inválido")
+    else:
+        messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
+
 def aplicar_sepia(tela,Path_img):
     if Path_img:
         conversao.converter_sepia(Path_img,caminho_modificado)
@@ -563,35 +576,62 @@ def aplicar_sepia(tela,Path_img):
     else:
         messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
 
-def aplicar_chroma(tela,Path_img):
-    if Path_img:
-        valor = pergunta_limiar()
-        imgfundo = filedialog.askopenfilename(title="Selecione uma Imagem para background", filetypes=[("Imagens", "*.jpg *.png *.jpeg *.tif *.tiff *.bmp")])
-        chroma.chromakey(Path_img, imgfundo, valor,caminho_modificado)
-        Application.display_image(tela,caminho_modificado)
-    else:
-        messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
+
 
 def aplicar_rotacao(tela,Path_img):
     if Path_img:
         resposta = simpledialog.askinteger("Valor","Insira o valor do ângulo")
-        rotacao_escala.
+        rotacao_escala.rotacao(Path_img,resposta,caminho_modificado)
         Application.display_image(tela,caminho_modificado)
     else:
         messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
+
+#Aplicar escala: menu para escolher linear ou nearest neighbour
+
+def escolha_escala(tela,Path_img,janela,opcao):
+    janela.destroy()
+    if opcao == 1:
+        # try:
+        resposta = simpledialog.askinteger("Valor","Insira um valor de escala")
+        rotacao_escala.interpolacao_nn(Path_img,resposta,caminho_modificado)
+        # except:
+            # messagebox.showinfo("Alerta","Você deve inserir um valor válido")
+    elif opcao == 2:
+        try:
+            resposta = simpledialog.askinteger("Valor","Insira um valor de escala")
+            rotacao_escala.interpolacao_lin(Path_img,resposta,caminho_modificado)
+        except:
+            messagebox.showinfo("Alerta","Você deve inserir um valor válido")
 
 def aplicar_escala(tela,Path_img):
     if Path_img:
+        janela = Toplevel()
+        janela .title("Selecione uma opção")
+        opcao = StringVar()
+        opcao1 = Radiobutton(janela, text="Vizinho mais próximo", variable=opcao, value="1")
+        opcao2 = Radiobutton(janela, text="Linear", variable=opcao, value="2")
+        opcao1.pack()
+        opcao2.pack()
+        botao = Button(janela, text="Selecionar", command=lambda:escolha_escala(tela,Path_img,janela,int(opcao.get())))
+        botao.pack()
         Application.display_image(tela,caminho_modificado)
     else:
         messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
 
+#Aplicar Fourier: rápida ou ingênua
 def aplicar_fourier(tela,Path_img):
     if Path_img:
+        janela = Toplevel()
+        janela .title("Selecione uma opção")
+        opcao = StringVar()
+        opcao1 = Button(janela, text="Transformada discreta", command=)
+        opcao2 = Button(janela, text="Transformada rápida", command=)
+        
         Application.display_image(tela,caminho_modificado)
     else:
         messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
 
+#main
 root = Tk()
 Application(root)
 root.mainloop()

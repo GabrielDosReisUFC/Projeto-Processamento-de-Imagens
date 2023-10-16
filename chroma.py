@@ -1,33 +1,23 @@
 from PIL import Image
 import numpy as np
 
-def chromakey(img_path, background_path, gthreshold, salvar):
-    img = Image.open(img_path)
-    background = Image.open(background_path)
-
-    # Certifique-se de que as imagens de entrada tenham as mesmas dimensões
-    if img.size != background.size:
-        # Se as dimensões forem diferentes, redimensione a imagem de fundo
-        background = background.resize(img.size, Image.ANTIALIAS)
+def chromakey(path,path2,valor,salvar):
+    img = Image.open(path)
+    img2 = Image.open(path2)
 
     img_array = np.array(img)
-    im_g = img_array[:, :, 1]
+    img_array2 = np.array(img2)
 
-    im_thresh = (im_g > (255 - gthreshold)).astype(np.uint8) * 255
-    im_thresh = np.stack((im_thresh, im_thresh, im_thresh), axis=-1)
+    for i in range(img.height):
+        for j in range(img.width):
+            r,g,b = img_array[i,j]
+            if g < 255-valor:
+              # print(g)
+              if i < img2.height and j < img2.width:
+                  img_array[i,j] = img_array2[i,j]
 
-    im_noback = im_thresh * img_array
-
-    background_array = np.array(background)
-    im_iv = 255 - im_thresh
-    im_z_nofront = im_iv * background_array
-
-    im_final = im_z_nofront + im_noback
-
-    # Converte a imagem resultante de volta para o formato PIL (Image)
-    im_final_pil = Image.fromarray(im_final.astype(np.uint8))
-
-    # Salva a imagem resultante
-    im_final_pil.save(salvar)
+    img_final = Image.fromarray(img_array)
+    img_final.save(salvar)
+    
 
 
