@@ -1,4 +1,4 @@
-from PIL import Image
+from PIL import Image,ImageDraw
 import numpy as np
 
 def inverter(path,salvar):

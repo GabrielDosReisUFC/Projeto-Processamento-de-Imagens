@@ -24,7 +24,6 @@ def RGB_HSV(R,G,B):
         S = delta/C_max * 100
 
     V = C_max * 100
-    H = H * 100 / 360
 
     return math.floor(H),math.floor(S),math.floor(V)
 
@@ -106,14 +105,14 @@ def converter_escala_cinza(img,salvar):
     imagem_original.close()
     imagem_cinza.save(salvar)
 
-def converter_escala_cinza_ponderada(img,salvar,peso1,peso2,peso3):
+def converter_escala_cinza_ponderada(img,salvar):
     imagem_original = Image.open(img)
     imagem_cinza = Image.new('L',(imagem_original.width,imagem_original.height))
     nova_imagem = ImageDraw.Draw(imagem_cinza)
     for linha in range(imagem_original.height):
         for coluna in range(imagem_original.width):
             r,g,b = imagem_original.getpixel((coluna,linha))
-            valor = (peso1*r+peso2*g+peso3*b)//(peso1+peso2+peso3)
+            valor = (0.299*r+0.587*g+0.114*b)
             nova_imagem.point((coluna,linha),fill=math.floor(valor))
     imagem_cinza.save(salvar)
     imagem_cinza.close()

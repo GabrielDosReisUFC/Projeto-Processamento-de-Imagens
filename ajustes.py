@@ -1,49 +1,62 @@
 import rgb2hsv
 from PIL import Image,ImageDraw
+import conversao
 
 def ajuste_matiz(img,valor,salvar):
     imagem = Image.open(img)
-    imagem_hsv = rgb2hsv.rgb2hsv(imagem)
-    imagem_nova = Image.new('RGB',(imagem_hsv.width,imagem_hsv.height))
+    largura = imagem.width
+    altura = imagem.height
+    imagem_nova = Image.new('RGB',(largura,altura))
     nova_imagem = ImageDraw.Draw(imagem_nova)
-    for linha in range(imagem_hsv.height):
-        for coluna in range(imagem_hsv.width):
-            H,S,V = imagem_hsv.getpixel((coluna,linha))
-            H = (H+valor)*360/100 
-            nova_imagem.point((coluna,linha),fill=conversao.HSV_RGB(H,S,V))
+    for linha in range(altura):
+        for coluna in range(largura):
+            H,S,V = imagem.getpixel((coluna,linha))
+            H += valor
+            if H > 360:
+                nova_imagem.point((coluna,linha),fill=conversao.HSV_RGB(H-360,S,V))
+            elif H < 0:
+                nova_imagem.point((coluna,linha),fill=conversao.HSV_RGB(H+360,S,V))
+            else:
+                nova_imagem.point((coluna,linha),fill=conversao.HSV_RGB(H,S,V))
     imagem_nova.save(salvar)
     imagem_nova.close()
-    imagem_hsv.close()
 
 def ajuste_saturacao(img,valor,salvar):
     imagem = Image.open(img)
-    imagem_hsv = rgb2hsv.rgb2hsv(imagem)
-    imagem_nova = Image.new('RGB',(imagem_hsv.width,imagem_hsv.height))
+    largura = imagem.width
+    altura = imagem.height
+    imagem_nova = Image.new('RGB',(largura,altura))
     nova_imagem = ImageDraw.Draw(imagem_nova)
-    for linha in range(imagem_hsv.height):
-        for coluna in range(imagem_hsv.width):
-            H,S,V = imagem_hsv.getpixel((coluna,linha))
-            nova_imagem.point((coluna,linha),fill=rgb2hsv.hsv2rgb(H,S+valor,V))
+    for linha in range(altura):
+        for coluna in range(largura):
+            H,S,V = imagem.getpixel((coluna,linha))
+            S += valor 
+            if S > 100:
+                nova_imagem.point((coluna,linha),fill=rgb2hsv.hsv2rgb(H,100,V))
+            elif S < 0:
+                nova_imagem.point((coluna,linha),fill=rgb2hsv.hsv2rgb(H,0,V))
+            else:
+                nova_imagem.point((coluna,linha),fill=rgb2hsv.hsv2rgb(H,S,V))
     imagem_nova.save(salvar)
-    imagem_hsv.close()
     imagem_nova.close()
 
 def ajuste_brilho(img,valor,salvar):
     imagem = Image.open(img)
-    imagem_hsv = rgb2hsv.rgb2hsv(imagem)
-    imagem_nova = Image.new('RGB',(imagem_hsv.width,imagem_hsv.height))
+    largura = imagem.width
+    altura = imagem.height
+    imagem_nova = Image.new('RGB',(largura,altura))
     nova_imagem = ImageDraw.Draw(imagem_nova)
-    for linha in range(imagem_hsv.height):
-        for coluna in range(imagem_hsv.width):
-            H,S,V = imagem_hsv.getpixel((coluna,linha))
-            if V+valor <=0:
+    for linha in range(altura.height):
+        for coluna in range(largura):
+            H,S,V = imagem.getpixel((coluna,linha))
+            V += valor
+            if V <=0:
                 nova_imagem.point((coluna,linha),fill=conversao.HSV_RGB(H,S,0))
-            elif V+valor >= 100:
+            elif V >= 100:
                 nova_imagem.point((coluna,linha),fill=conversao.HSV_RGB(H,S,100))
             else:
-                nova_imagem.point((coluna,linha),fill=rgb2hsv.hsv2rgb(H,S,V+valor))
+                nova_imagem.point((coluna,linha),fill=rgb2hsv.hsv2rgb(H,S,V))
     imagem_nova.save(salvar)
-    imagem_hsv.close()
     imagem_nova.close()
 
 

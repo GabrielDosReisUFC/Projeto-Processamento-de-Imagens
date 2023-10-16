@@ -135,6 +135,7 @@ class Application:
         else:
             self.Top_level = Toplevel(self.root)  # Cria uma nova janela sobre a janela principal
             self.Top_level.title("Imagem")
+            self.Top_level.attributes('-topmost', 1)
             imagem.save(caminho_modificado)
         if imagem.mode != 'RGB' and imagem.mode != 'HSV':
             self.colorido = False
@@ -399,7 +400,8 @@ def aplicar_filtros(tela,Path_img,colorido):
                     filtro.agucamento_rgb(Path_img,caminho_modificado)
                 Application.display_image(tela,caminho_modificado)
                 top_level.destroy()
-            except:
+            except Exception as e:
+                print(e)
                 messagebox.showinfo("Alerta","formato inválido.")
                 
     top_level = Toplevel()
