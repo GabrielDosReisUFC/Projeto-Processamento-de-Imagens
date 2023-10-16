@@ -81,7 +81,7 @@ class Application:
         self.bt12 = Button(self.frame3, width=30, height=1, compound="c", text="Sepia", command=lambda:aplicar_sepia(self,self.Path_img))
         self.bt12.grid(row=13,column=0,ipadx = 5, ipady= 5 )
 
-        self.bt13 = Button(self.frame3, width=30, height=1, compound="c", text="Chroma-key", command=lambda:aplicar_chroma(self,self.Path_img))
+        self.bt13 = Button(self.frame3, width=30, height=1, compound="c", text="Chroma key", command=lambda:aplicar_chroma(self,self.Path_img))
         self.bt13.grid(row=14,column=0,ipadx = 5, ipady= 5 )
 
         self.bt14 = Button(self.frame3, width=30, height=1, compound="c", text="Rotação", command=lambda:aplicar_rotacao(self,self.Path_img))
@@ -574,6 +574,8 @@ def aplicar_chroma(tela,Path_img):
 
 def aplicar_rotacao(tela,Path_img):
     if Path_img:
+        resposta = simpledialog.askinteger("Valor","Insira o valor do ângulo")
+        rotacao_escala.
         Application.display_image(tela,caminho_modificado)
     else:
         messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")

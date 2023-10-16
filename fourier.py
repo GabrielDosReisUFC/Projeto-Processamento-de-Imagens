@@ -1,6 +1,5 @@
 import numpy as np
 from cmath import exp, pi
-from cv2 import imshow
 
 #Transformada discreta ingênua de Fourier
 def DFT2D(f):
@@ -25,7 +24,7 @@ def IDFT2D(F):
                 f[x,y] += np.real(np.sum(F[:,v] * np.exp( (1j*2*np.pi) * (((u*x)/n)+((v*y)/m)) )))
     return np.real(f/np.sqrt(n*m))
 
-#Rápida
+#Rápida - recursiva divisão e conquista
 def FFT(f):
     N = len(f)
     if N <= 1:
@@ -37,3 +36,5 @@ def FFT(f):
         aux[u] = par[u] + exp(-2j*pi*u/N) * impar[u] 
         aux[u+N//2] = par[u] - exp(-2j*pi*u/N)*impar[u]              
     return aux
+
+
