@@ -16,9 +16,7 @@ def contagem_de_pixels(height, width, dados_imagem):
 
 def histograma(file_path):
     imagem_original = Image.open(file_path)  
-    #imagem_original.save(file_path)
     dados_imagem = np.array(imagem_original)
-    # pixel_total = imagem_original.height * imagem_original.width
 
     contagem_pixel = contagem_de_pixels(imagem_original.height, imagem_original.width, dados_imagem) 
 
@@ -28,7 +26,6 @@ def histograma(file_path):
 def histograma_equalizado(file_path,salvar):
     
     imagem_original = Image.open(file_path)  
-    #imagem_original.save(file_path)
     dados_imagem = np.array(imagem_original)
     pixel_total = imagem_original.height * imagem_original.width
     
@@ -60,9 +57,6 @@ def histograma_intensidade(img):
         for coluna in range(imagem.width):
             H,S,I = imagem.getpixel((coluna,linha))
             contagem_pixel_intensiade[I] += 1
-
-    # plt.plot(range(0,101),contagem_pixel_intensiade)
-    # plt.show()
     return contagem_pixel_intensiade
 
 def histograma_rgb(file_path):
@@ -107,9 +101,6 @@ def histograma_rgb(file_path):
 
     plt.tight_layout()
     plt.show()
-
-# histograma_rgb("mulher.tif")
-# histograma_intensidade("mulher.tif")
 
 def equalizar_intensidade(img,salvar):
     imagem = converter_RGB_HSV(img)    

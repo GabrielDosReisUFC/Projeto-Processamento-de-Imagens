@@ -115,7 +115,6 @@ def converter_escala_cinza_ponderada(img,salvar,peso1,peso2,peso3):
             r,g,b = imagem_original.getpixel((coluna,linha))
             valor = (peso1*r+peso2*g+peso3*b)//(peso1+peso2+peso3)
             nova_imagem.point((coluna,linha),fill=math.floor(valor))
-    # imagem_cinza.save(salvar)
     imagem_cinza.save(salvar)
 
 def negativo(r,g,b):
@@ -152,4 +151,3 @@ def converter_serpia(img,salvar):
             nova_imagem.point((coluna,linha),fill=serpia(r,g,b))
 
     imagem_cinza.save(salvar)
-# converter_serpia("mulher.tif","serpia.tif")
