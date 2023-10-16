@@ -1,5 +1,6 @@
 import numpy as np
 from cmath import exp, pi
+from cv2 import imshow
 
 #Transformada discreta ingênua de Fourier
 def DFT2D(f):
@@ -34,24 +35,5 @@ def FFT(f):
     aux = np.zeros(N).astype(np.complex64)
     for u in range(N//2):
         aux[u] = par[u] + exp(-2j*pi*u/N) * impar[u] 
-        aux[u+N//2] = par[u] - exp(-2j*pi*u/N)*impar[u]  
-                
+        aux[u+N//2] = par[u] - exp(-2j*pi*u/N)*impar[u]              
     return aux
-
-def fftshift(x, axes=None):
-    x = asarray(x)
-    if axes is None:
-        axes = tuple(range(x.ndim))
-        shift = [dim // 2 for dim in x.shape]
-    elif isinstance(axes, integer_types):
-        shift = x.shape[axes] // 2
-    else:
-        shift = [x.shape[ax] // 2 for ax in axes]
-
-    return roll(x, shift, axes)
-
-
-def ffiltro(tamanho,img):
-    img_s = img[:tamanho, :tamanho]
-    Fs = DFT2D(img_s)
-    imshow(np.log(1 + fftshift(np.abs(Fs))))

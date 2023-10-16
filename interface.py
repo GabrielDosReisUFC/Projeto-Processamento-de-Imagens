@@ -18,7 +18,7 @@ import linear
 import filtro
 import conversao
 import ajustes
-
+import chroma
 caminho_modificado = os.getcwd()  + "\modificado.tif"
 
 class Application:
@@ -60,47 +60,38 @@ class Application:
         self.bt4 = Button(self.frame3, width=30, height=1, compound="c", text="Histograma", command=lambda:aplicar_histograma(self,self.Path_img_normal,self.colorido))
         self.bt4.grid(row=4,column=0,ipadx = 5, ipady= 5 )
         
-        # self.bt5 = Button(self.frame3, width=30, height=1, compound="c", text="Equalizar por Histograma", command=lambda:aplicar_equalizar_histograma(self,self.Path_img,self.colorido))
-        # self.bt5.grid(row=5,column=0,ipadx = 5, ipady= 5 )
-        
         self.bt6 = Button(self.frame3, width=30, height=1, compound="c", text="Limearização", command=lambda:aplicar_Limiar(self,self.Path_img))
-        self.bt6.grid(row=6,column=0,ipadx = 5, ipady= 5 )
+        self.bt6.grid(row=5,column=0,ipadx = 5, ipady= 5 )
         
         self.bt7 = Button(self.frame3, width=30, height=1, compound="c", text="Aplicar Esteganografia", command=lambda:aplicar_Esteganografia(self.Path_img,self.colorido,self.text_area))
-        self.bt7.grid(row=7,column=0,ipadx = 5, ipady= 5 )
-        
-        # self.bt7 = Button(self.frame3, width=30, height=1, compound="c", text="Ler Esteganografia", command=lambda:ler_Esteganografia(self.Path_img, self.text_area))
-        # self.bt7.grid(row=8,column=0,ipadx = 5, ipady= 5 )
+        self.bt7.grid(row=6,column=0,ipadx = 5, ipady= 5 )
         
         self.bt8 = Button(self.frame3, width=30, height=1, compound="c", text="Linear definido por partes", command=lambda:aplicar_linear(self,self.Path_img))
-        self.bt8.grid(row=9,column=0,ipadx = 5, ipady= 5 )
+        self.bt8.grid(row=8,column=0,ipadx = 5, ipady= 5 )
         
         self.bt9 = Button(self.frame3, width=30, height=1, compound="c", text="Filtros", command=lambda:aplicar_filtros(self,self.Path_img))
-        self.bt9.grid(row=10,column=0,ipadx = 5, ipady= 5 )
+        self.bt9.grid(row=9,column=0,ipadx = 5, ipady= 5 )
 
         self.bt10 = Button(self.frame3, width=30, height=1, compound="c", text="Escala de cinza", command=lambda:aplicar_converter_escala_cinza(self,self.Path_img,self.colorido))
-        self.bt10.grid(row=11,column=0,ipadx = 5, ipady= 5 )
-        
-        self.bt11 = Button(self.frame3, width=30, height=1, compound="c", text="Escala de cinza ponderado", command=lambda:aplicar_converter_escala_cinza_ponderado(self,self.Path_img))
-        self.bt11.grid(row=9,column=0,ipadx = 5, ipady= 5 )
+        self.bt10.grid(row=10,column=0,ipadx = 5, ipady= 5 )
 
-        self.bt12 = Button(self.frame3, width=30, height=1, compound="c", text="Ajustes", command=lambda:aplicar_ajustes(self,self.Path_img,self.colorido))
+        self.bt11 = Button(self.frame3, width=30, height=1, compound="c", text="Ajustes", command=lambda:aplicar_ajustes(self,self.Path_img,self.colorido))
+        self.bt11.grid(row=12,column=0,ipadx = 5, ipady= 5 )
+
+        self.bt12 = Button(self.frame3, width=30, height=1, compound="c", text="Sepia", command=lambda:aplicar_sepia(self,self.Path_img))
         self.bt12.grid(row=13,column=0,ipadx = 5, ipady= 5 )
 
-        self.bt13 = Button(self.frame3, width=30, height=1, compound="c", text="Sepia", command=lambda:aplicar_sepia(self,self.Path_img))
-        self.bt13.grid(row=9,column=0,ipadx = 5, ipady= 5 )
+        self.bt13 = Button(self.frame3, width=30, height=1, compound="c", text="Chroma-key", command=lambda:aplicar_chroma(self,self.Path_img))
+        self.bt13.grid(row=14,column=0,ipadx = 5, ipady= 5 )
 
-        self.bt14 = Button(self.frame3, width=30, height=1, compound="c", text="Chroma-key", command=None)
-        self.bt14.grid(row=9,column=0,ipadx = 5, ipady= 5 )
+        self.bt14 = Button(self.frame3, width=30, height=1, compound="c", text="Rotação", command=lambda:aplicar_rotacao(self,self.Path_img))
+        self.bt14.grid(row=15,column=0,ipadx = 5, ipady= 5 )
 
-        self.bt15 = Button(self.frame3, width=30, height=1, compound="c", text="Rotação", command=None)
-        self.bt15.grid(row=9,column=0,ipadx = 5, ipady= 5 )
+        self.bt15 = Button(self.frame3, width=30, height=1, compound="c", text="Escala", command=lambda:aplicar_escala(self,self.Path_img))
+        self.bt15.grid(row=16,column=0,ipadx = 5, ipady= 5 )
 
-        self.bt16 = Button(self.frame3, width=30, height=1, compound="c", text="Escala", command=lambda:aplicar_escala(self,self.Path_img))
+        self.bt16 = Button(self.frame3, width=30, height=1, compound="c", text="Fourier", command=lambda:aplicar_fourier(self,self.Path_img))
         self.bt16.grid(row=17,column=0,ipadx = 5, ipady= 5 )
-
-        self.bt17 = Button(self.frame3, width=30, height=1, compound="c", text="Fourier", command=lambda:aplicar_fourier(self,self.Path_img))
-        self.bt17.grid(row=18,column=0,ipadx = 5, ipady= 5 )
 
         self.frame_aux = Frame(root)
         self.frame_aux.pack(fill=BOTH,expand=True,padx=5,pady=5)
@@ -170,7 +161,6 @@ class Application:
             # self.label_img.place(relx = 0, rely= 0)
         
         self.Path_img = path
-        self.Path_img_2 = path2
 
     def normal(self,path):
         if self.Path_img:
@@ -201,7 +191,7 @@ class Application:
 def aplicar_negativo(tela,Path_img,colorido):
     if Path_img:
         if colorido:
-            conversao.converter_negativo(Path_img,caminho_modificado)
+            negativo.negativo_RGB(Path_img,caminho_modificado)
         else:
             negativo.inverter(Path_img,caminho_modificado)
         Application.display_image(tela,caminho_modificado)
@@ -271,21 +261,6 @@ def aplicar_histograma(tela,Path_img,colorido):
 
     else:
         messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
-    
-# def aplicar_equalizar_histograma(tela,Path_img,colorido):
-#     if Path_img:
-#         if colorido:
-#             contagem_pixel = histograma.equalizar_intensidade(Path_img,caminho_modificado)
-#             Application.display_image(tela,caminho_modificado)
-#             plt.plot(range(0,101),contagem_pixel)
-#             plt.show()
-#         else:
-#             contagem_pixel = histograma.histograma_equalizado(Path_img,caminho_modificado)
-#             Application.display_image(tela,caminho_modificado)
-#             plt.plot(range(0,256),contagem_pixel)
-#             plt.show()
-#     else:
-#         messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
 
 def pergunta_limiar():
     try:
@@ -299,10 +274,10 @@ def pergunta_limiar():
         return None
 
 def aplicar_Limiar(tela,Path_img):
-    if Path_img:
+    if Path_img:       
         valor = pergunta_limiar()
         if valor is not None:
-            limearizacao.limearizar(Path_img,valor)
+            limearizacao.limearizar(Path_img,valor,caminho_modificado)
             Application.display_image(tela,caminho_modificado)
     else:
         messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
@@ -340,33 +315,10 @@ def aplicar_Esteganografia(Path_img,colorido,text):
     else:
         messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
 
-# def aplicar_Esteganografia(Path_img, text):
-#     if Path_img:
-#         mensagem = text.get("1.0","end-1c")
-#         esteganografia.hide_message(Path_img,mensagem)
-#     else:
-#         messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
-
-# def ler_Esteganografia(Path_img, text):
-#     if Path_img:
-#         mensagem = esteganografia.extract_and_display_message(Path_img)
-#         text.delete("1.0", END)
-#         text.insert("1.0", mensagem)
-#     else:
-#         messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
-
 def aplicar_linear(tela,Path_img):
     if Path_img:
         linear.linearizar(Path_img,caminho_modificado)
         Application.display_image(tela,caminho_modificado)
-    else:
-        messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
-
-def aplicar_chroma(tela,Path_img,Path_img2):
-    if Path_img:
-        valor = pergunta_limiar()
-        chroma.chromakey(img, imgfundo, valor)
-        
     else:
         messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
 
@@ -411,23 +363,20 @@ def aplicar_filtros(tela,Path_img):
 
     def escolha():
         opcao_selecionada = opcao.get()
-        if opcao_selecionada == "Genérico":
+        if opcao_selecionada == "Generico" or opcao_selecionada == "ponderada":
             resposta = escolher_tamanho()
             for widget in top_level.winfo_children():
                 widget.destroy()
             definir_kernel(resposta,top_level)
         else:
             if opcao_selecionada == "simples":
-                pass
-                # filtro.me
-            if opcao_selecionada == "ponderada":
-                pass
+                resposta = escolher_tamanho()
+                if resposta is not None:
+                    filtro.convolucao_media(Path_img,resposta,caminho_modificado)
             if opcao_selecionada == "mediana":
                 resposta = escolher_tamanho()
                 if resposta is not None:
                     filtro.convoluca_mediana(Path_img,resposta,caminho_modificado)
-            if opcao_selecionada == "ponderada":
-                pass
             if opcao_selecionada == "laplaciano":
                 filtro.laplaciano(Path_img,caminho_modificado)
             if opcao_selecionada == "high":
@@ -440,9 +389,9 @@ def aplicar_filtros(tela,Path_img):
                 img.save(caminho_modificado)
             if opcao_selecionada == "magnitude":
                 filtro.sorbel(Path_img,caminho_modificado)
-            if opcao_selecionada == "suavização":
+            if opcao_selecionada == "suavizacao":
                 filtro.suavizacao_rgb(Path_img,caminho_modificado)
-            if opcao_selecionada == "aguçamento":
+            if opcao_selecionada == "agucamento":
                 filtro.agucamento_rgb(Path_img,caminho_modificado)
             Application.display_image(tela,caminho_modificado)
             top_level.destroy()
@@ -455,13 +404,13 @@ def aplicar_filtros(tela,Path_img):
     op_2 = ttk.Radiobutton(top_level, text="Filtro de suavização média simples", variable=opcao, value="simples")
     op_3 = ttk.Radiobutton(top_level, text="Filtro de suavização média ponderada", variable=opcao, value="ponderada")
     op_4 = ttk.Radiobutton(top_level, text="Filtro de mediana", variable=opcao, value="mediana")
-    op_5 = ttk.Radiobutton(top_level, text="Filtro de Laplaciano", variable=opcao, value="laplaciano")
+    op_5 = ttk.Radiobutton(top_level, text="Filtro Laplaciano", variable=opcao, value="laplaciano")
     op_6 = ttk.Radiobutton(top_level, text="Filtro de High-Boost", variable=opcao, value="high")
     op_7 = ttk.Radiobutton(top_level, text="Filtro de Sobel x", variable=opcao, value="x")
     op_8 = ttk.Radiobutton(top_level, text="Filtro de Sobel y", variable=opcao, value="y")
     op_9 = ttk.Radiobutton(top_level, text="Filtro de bordas pelo gradiente", variable=opcao, value="magnitude")
-    op_10 = ttk.Radiobutton(top_level, text="Filtro de suavizacao em RGB", variable=opcao, value="suavizacao")
-    op_11 = ttk.Radiobutton(top_level, text="Filtro de agucamento em RGB", variable=opcao, value="agucamento")
+    op_10 = ttk.Radiobutton(top_level, text="Filtro de suavização em RGB", variable=opcao, value="suavizacao")
+    op_11 = ttk.Radiobutton(top_level, text="Filtro de aguçamento em RGB", variable=opcao, value="agucamento")
     op_1.pack()
     op_2.pack()
     op_3.pack()
@@ -538,13 +487,6 @@ def aplicar_converter_escala_cinza(tela,Path_img,colorido):
     else:
         messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
 
-# def aplicar_converter_escala_cinza_simples(tela,Path_img):
-#     if Path_img:
-#         conversao.converter_escala_cinza(Path_img,caminho_modificado)
-#         Application.display_image(tela,caminho_modificado)
-#     else:
-#         messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
-
 def escolha_ajutes(tela,Path_img,janela,opcao):
     janela.destroy()
     if opcao == 1:
@@ -610,19 +552,22 @@ def aplicar_ajustes(tela,Path_img,colorido):
             botao = Button(janela, text="Selecionar", command=lambda:escolha_ajutes(tela,Path_img,janela,int(opcao.get())))
             botao.pack()
         else:
-            messagebox.showinfo("Alerta","Formato de imagem invalido")
+            messagebox.showinfo("Alerta","Formato de imagem inválido")
     else:
         messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
 
 def aplicar_sepia(tela,Path_img):
     if Path_img:
-        conversao.converter_serpia(Path_img,caminho_modificado)
+        conversao.converter_sepia(Path_img,caminho_modificado)
         Application.display_image(tela,caminho_modificado)
     else:
         messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
 
-def aplicar_chorma_key(tela,Path_img):
+def aplicar_chroma(tela,Path_img):
     if Path_img:
+        valor = pergunta_limiar()
+        imgfundo = filedialog.askopenfilename(title="Selecione uma Imagem para background", filetypes=[("Imagens", "*.jpg *.png *.jpeg *.tif *.tiff *.bmp")])
+        chroma.chromakey(Path_img, imgfundo, valor,caminho_modificado)
         Application.display_image(tela,caminho_modificado)
     else:
         messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
@@ -648,5 +593,3 @@ def aplicar_fourier(tela,Path_img):
 root = Tk()
 Application(root)
 root.mainloop()
-
-

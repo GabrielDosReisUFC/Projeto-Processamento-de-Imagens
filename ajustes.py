@@ -1,9 +1,10 @@
+import rgb2hsv
 import conversao
 from PIL import Image,ImageDraw
 import numpy as np
 
 def ajuste_matiz(img,valor,salvar):
-    imagem_hsv = conversao.converter_RGB_HSV(img)
+    imagem_hsv = rgb2hsv.rgb2hsv(img)
     imagem_nova = Image.new('RGB',(imagem_hsv.width,imagem_hsv.height))
     nova_imagem = ImageDraw.Draw(imagem_nova)
     for linha in range(imagem_hsv.height):
@@ -16,7 +17,7 @@ def ajuste_matiz(img,valor,salvar):
 # ajuste_matiz("imagem_modificada.PNG",90)
 
 def ajuste_saturacao(img,valor,salvar):
-    imagem_hsv = conversao.converter_RGB_HSV(img)
+    imagem_hsv = rgb2hsv.rgb2hsv(img)
     imagem_nova = Image.new('RGB',(imagem_hsv.width,imagem_hsv.height))
     nova_imagem = ImageDraw.Draw(imagem_nova)
     for linha in range(imagem_hsv.height):
@@ -28,7 +29,7 @@ def ajuste_saturacao(img,valor,salvar):
 # ajuste_saturacao("imagem_modificada.PNG",100)
 
 def ajuste_brilho(img,valor,salvar):
-    imagem_hsv = conversao.converter_RGB_HSV(img)
+    imagem_hsv = rgb2hsv.rgb2hsv(img)
     imagem_nova = Image.new('RGB',(imagem_hsv.width,imagem_hsv.height))
     nova_imagem = ImageDraw.Draw(imagem_nova)
     for linha in range(imagem_hsv.height):

@@ -99,9 +99,6 @@ def converter_HSV_RGB(img):
 
     return imagem_rgb
 
-    # nao eh possivel salvar
-    # imagem_hsv.save("foguette.png")
-
 def converter_escala_cinza(img,salvar):
     imagem_original = Image.open(img)
     imagem_cinza = Image.new('L',(imagem_original.width,imagem_original.height))
@@ -112,18 +109,6 @@ def converter_escala_cinza(img,salvar):
             nova_imagem.point((coluna,linha),fill=((r+g+b)//3))
 
     imagem_cinza.save(salvar)
-
-
-# def escala_cinza_ponderada(r,g,b,peso1,peso2,peso3):
-#     print(r,g,b)
-#     print(peso1)
-#     print(peso2)
-#     print(peso3)
-#     cinza = 
-#     print(cinza)
-#     math.floor(cinza)
-#     print(cinza)
-#     return cinza
 
 def converter_escala_cinza_ponderada(img,salvar,peso1,peso2,peso3):
     imagem_original = Image.open(img)
@@ -153,21 +138,20 @@ def converter_negativo(img,salvar):
 
     imagem_cinza.save(salvar)
 
-def serpia(r,g,b):
-    serpia_r = (0.393 * r + 0.769 * g + 0.189 * b)
-    serpia_g = (0.349 * r + 0.686 * g + 0.168 * b)
-    serpia_b = (0.272 * r + 0.534 * g + 0.131 * b)
+def sepia(R,G,B):
+    sepiaR = 0.393*R + 0.769*G + 0.189*B
+    sepiaG = 0.349*R + 0.686*G + 0.168*B
+    sepiaB = 0.272*R + 0.534*G + 0.131*B
 
-    return math.floor(serpia_r),math.floor(serpia_g),math.floor(serpia_b)
+    return math.floor(sepiaR),math.floor(sepiaG),math.floor(sepiaB)
 
-def converter_serpia(img,salvar):
+def converter_sepia(img,salvar):
     imagem_original = Image.open(img)
     imagem_cinza = Image.new('RGB',(imagem_original.width,imagem_original.height))
     nova_imagem = ImageDraw.Draw(imagem_cinza)
     for linha in range(imagem_original.height):
         for coluna in range(imagem_original.width):
             r,g,b = imagem_original.getpixel((coluna,linha))
-            nova_imagem.point((coluna,linha),fill=serpia(r,g,b))
+            nova_imagem.point((coluna,linha),fill=sepia(r,g,b))
 
     imagem_cinza.save(salvar)
-# converter_serpia("mulher.tif","serpia.tif")
