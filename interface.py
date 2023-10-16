@@ -2,8 +2,10 @@ from tkinter import *
 from tkinter import simpledialog
 from tkinter import filedialog
 from tkinter import messagebox
-from PIL import Image, ImageTk
 from tkinter import ttk
+from tkinter import messagebox
+from tkinter import Toplevel, StringVar, Radiobutton, Button, messagebox
+from PIL import Image, ImageTk
 import numpy as np
 import os
 import matplotlib.pyplot as plt
@@ -18,8 +20,12 @@ import linear
 import filtro
 import conversao
 import ajustes
-import croma
+import chroma
 import rotacao_escala
+import fourier
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.figure import Figure
+
 caminho_modificado = os.getcwd()  + "\modificado.tif"
 
 class Application:
@@ -558,13 +564,10 @@ def aplicar_ajustes(tela,Path_img,colorido):
 
 def aplicar_chroma(tela,Path_img):
     if Path_img:
-        if colorido:
             valor = pergunta_limiar()
             imgfundo = filedialog.askopenfilename(title="Selecione uma Imagem para background", filetypes=[("Imagens", "*.jpg *.png *.jpeg *.tif *.tiff *.bmp")])
             chroma.chromakey(Path_img, imgfundo, valor,caminho_modificado)
             Application.display_image(tela,caminho_modificado)
-        else:
-            messagebox.showinfo("Alerta","Formato de imagem inválido")
     else:
         messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
 
@@ -620,18 +623,56 @@ def aplicar_escala(tela,Path_img):
     else:
         messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
 
+def escolher_fourier(Path_img,janela,opcao):
+    janela.destroy()
+    if opcao == 1:
+        fourier.DFT2D(Path_img,caminho_modificado)
+    elif opcao == 2:
+        fourier.FFT(Path_img,caminho_modificado)
+
 #Aplicar Fourier: rápida ou ingênua
 def aplicar_fourier(tela,Path_img):
     if Path_img:
         janela = Toplevel()
         janela .title("Selecione uma opção")
         opcao = StringVar()
-        opcao1 = Button(janela, text="Transformada discreta", command=)
-        opcao2 = Button(janela, text="Transformada rápida", command=)
-        
+        opcao1 = Radiobutton(janela, text="Transformada discreta", variable=opcao, value="1")
+        opcao2 = Radiobutton(janela, text="Transformada rápida", variable=opcao, value="2")
+        opcao1.pack()
+        opcao2.pack()
+        botao = Button(janela, text="Selecionar", command=lambda:escolher_fourier(Path_img,janela,int(opcao.get())))
+        botao.pack()
         Application.display_image(tela,caminho_modificado)
+        canvas = FigureCanvasTkAgg(Figure(figsize=(6, 4)), master=tela)
+        canvas.get_tk_widget().pack()
+        fourier.edit_spectrum_with_brush(caminho_modificado, canvas)
+        magnitude_spectrum = np.abs(F)
+        plt.imshow(np.log(1 + magnitude_spectrum), cmap='gray')
+        def edit_spectrum_with_brush(img, canvas):
+            imagem = plt.imread(img)
+            F = np.array(imagem)
+            def edit(event):
+                x, y = int(event.xdata), int(event.ydata)
+                radius = 5  # Tamanho do pincel
+                mask = np.zeros(F.shape)
+                for i in range(x - radius, x + radius + 1):
+                    for j in range(y - radius, y + radius + 1):
+                        if 0 <= i < F.shape[1] and 0 <= j < F.shape[0]:
+                            mask[j, i] = 1  # Define os pontos dentro do raio do pincel como 1
+                            F *= (1 - mask)  # Inverte os pontos clicados de preto para branco
+
+            canvas.figure.clf()
+            magnitude_spectrum = np.abs(F)
+            plt.imshow(np.log(1 + magnitude_spectrum), cmap='gray')
+            plt.title('Espectro')
+            plt.colorbar()
+            plt.show()
+            canvas.draw()
+            modified_F = F  
+            filtered_image = fourier.IDFT2D(modified_F)  
     else:
         messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
+    
 
 #main
 root = Tk()
