@@ -10,11 +10,11 @@ def ajuste_matiz(img,valor,salvar):
     for linha in range(imagem_hsv.height):
         for coluna in range(imagem_hsv.width):
             H,S,V = imagem_hsv.getpixel((coluna,linha))
-            H = H * 360/100 + valor
+            H = (H+valor)*360/100 
             nova_imagem.point((coluna,linha),fill=conversao.HSV_RGB(H,S,V))
-    imagem_nova.save(salvar)
-    # return imagem_rgb
-# ajuste_matiz("imagem_modificada.PNG",90)
+    imagem_nova.show()
+    
+# ajuste_matiz("cubo.tif",100,"modificado.tif")
 
 def ajuste_saturacao(img,valor,salvar):
     imagem_hsv = rgb2hsv.rgb2hsv(img)

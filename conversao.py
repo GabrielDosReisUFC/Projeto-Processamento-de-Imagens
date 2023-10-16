@@ -25,8 +25,7 @@ def RGB_HSV(R,G,B):
 
     V = C_max * 100
     H = H * 100 / 360
-    # S = S * 255 / 100
-    # V = V * 255 / 100
+
     return math.floor(H),math.floor(S),math.floor(V)
 
 def converter_RGB_HSV(img):
@@ -41,11 +40,8 @@ def converter_RGB_HSV(img):
 
     return imagem_hsv
 
-    # nao eh possivel salvar
-    # imagem_hsv.save("foguette.png")
-    
-# converter_RGB_HSV("mulher.tif")
 def HSV_RGB(H,S,V):
+    
     S = S/100
     V = V/100
     R = 0; G = 0; B = 0
@@ -106,7 +102,7 @@ def converter_escala_cinza(img,salvar):
     for linha in range(imagem_original.height):
         for coluna in range(imagem_original.width):
             r,g,b = imagem_original.getpixel((coluna,linha))
-            nova_imagem.point((coluna,linha),fill=((r+g+b)//3))
+            nova_imagem.point((coluna,linha),fill=(math.floor(r+g+b)//3))
 
     imagem_cinza.save(salvar)
 
@@ -117,8 +113,9 @@ def converter_escala_cinza_ponderada(img,salvar,peso1,peso2,peso3):
     for linha in range(imagem_original.height):
         for coluna in range(imagem_original.width):
             r,g,b = imagem_original.getpixel((coluna,linha))
-            nova_imagem.point((coluna,linha),fill=((peso1*r+peso2*g+peso3*b)//(peso1+peso2+peso3)))
-
+            valor = (peso1*r+peso2*g+peso3*b)//(peso1+peso2+peso3)
+            nova_imagem.point((coluna,linha),fill=math.floor(valor))
+    # imagem_cinza.save(salvar)
     imagem_cinza.save(salvar)
 
 def negativo(r,g,b):

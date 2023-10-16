@@ -19,6 +19,7 @@ import filtro
 import conversao
 import ajustes
 import chroma
+import chroma
 caminho_modificado = os.getcwd()  + "\modificado.tif"
 
 class Application:
@@ -193,7 +194,7 @@ def aplicar_negativo(tela,Path_img,colorido):
         if colorido:
             negativo.negativo_RGB(Path_img,caminho_modificado)
         else:
-            negativo.inverter(Path_img,caminho_modificado)
+            negativo.negativo_simples(Path_img,caminho_modificado)
         Application.display_image(tela,caminho_modificado)
     else:
         messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
@@ -571,7 +572,6 @@ def aplicar_chroma(tela,Path_img):
         Application.display_image(tela,caminho_modificado)
     else:
         messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
-
 def aplicar_rotacao(tela,Path_img):
     if Path_img:
         Application.display_image(tela,caminho_modificado)

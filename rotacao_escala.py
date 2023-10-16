@@ -40,7 +40,6 @@ def warpAff2(image, matrix, width, height):
                     dst[v, u] = pix
         return dst
 
-
 def rotacao(img):
     angle = sys.argv[2]
 

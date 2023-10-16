@@ -1,8 +1,6 @@
 from tkinter import *
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.pyplot as plt
-import retornarPath
-import multiprocessing
 import numpy as np
 from conversao import converter_RGB_HSV
 from conversao import converter_HSV_RGB
@@ -20,7 +18,6 @@ def histograma(file_path):
     imagem_original = Image.open(file_path)  
     #imagem_original.save(file_path)
     dados_imagem = np.array(imagem_original)
-    print(imagem_original.width,imagem_original.height)
     # pixel_total = imagem_original.height * imagem_original.width
 
     contagem_pixel = contagem_de_pixels(imagem_original.height, imagem_original.width, dados_imagem) 

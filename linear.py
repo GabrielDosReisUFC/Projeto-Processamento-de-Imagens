@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
-from PIL import Image
+from PIL import Image,ImageDraw
 import math
+
 def linearizar(image_path,salvar):
     # Variáveis globais para armazenar os pontos
     points = []
@@ -59,35 +60,41 @@ def linearizar(image_path,salvar):
         if i != 0:
             m = (points[i][1] - points[i-1][1]) / (points[i][0] - points[i-1][0])
             n = points[i][1] - m*points[i][0]
-            # if n > 0 :
-            #     print(f'y = {m}x + {n}')
-            # elif n < 0 :
-            #     print(f'y = {m}x {n}')
-            # else : print(f'y = {m}')
             dicionario[points[i][0]] = (m,n)
 
     # Abra a imagem .tif
     img_aux = Image.open(image_path)
-    print(img_aux.width,img_aux.height)
-    # Percorra cada pixel da imagem
-    for x in range(img_aux.width):
-        for y in range(img_aux.height):
-            pixel = int(img_aux.getpixel((x, y)))
+    if img_aux.mode == "RGB" or "HSV":
+        for i in dicionario.keys():
+           print(dicionario[i][0],dicionario[i][1])
+        imagem = Image.new('RGB',(img_aux.width,img_aux.height))
+        nova_imagem = ImageDraw.Draw(imagem)
+        for linha in range(img_aux.height):
+            for coluna in range(img_aux.width):
+                r,g,b = img_aux.getpixel((coluna,linha))
 
-            # Modifique o último bit de cada canal RGB para ocultar a mensagem
-            
-            for i in dicionario.keys():
-                if pixel <= i:
-                    pixel = math.floor(pixel*dicionario[i][0] + dicionario[i][1])
-
-            # Atualize o pixel na imagem
-            img_aux.putpixel((x, y), pixel)
-    
-    # Salve a imagem resultante
-    img_aux.save(salvar)
-    img_aux.close()
-    img = Image.open(salvar)
-    img.save(image_path)
-    img.close()
-
-# linearizar("a")
+                for i in dicionario.keys():
+                    if r <= i:
+                        r = math.floor(r*dicionario[i][0] + dicionario[i][1])
+                    if g <= i:
+                        g = math.floor(g*dicionario[i][0] + dicionario[i][1])
+                    if b <= i:
+                        b = math.floor(b*dicionario[i][0] + dicionario[i][1])
+                
+                nova_imagem.point((coluna,linha),fill=(r,g,b))
+            imagem.save(salvar)
+    else:
+        for x in range(img_aux.width):
+            for y in range(img_aux.height):
+                pixel = int(img_aux.getpixel((x, y)))                
+                for i in dicionario.keys():
+                    if pixel <= i:
+                        pixel = math.floor(pixel*dicionario[i][0] + dicionario[i][1])
+                # Atualize o pixel na imagem
+                img_aux.putpixel((x, y), pixel)
+                # Salve a imagem resultante
+        img_aux.save(salvar)
+        img_aux.close()
+        img = Image.open(salvar)
+        img.save(image_path)
+        img.close()
