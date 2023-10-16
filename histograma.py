@@ -22,6 +22,7 @@ def histograma(file_path):
 
     plt.plot(range(0,256),contagem_pixel)
     plt.show()
+    imagem_original.close()
 
 def histograma_equalizado(file_path,salvar):
     
@@ -102,6 +103,8 @@ def histograma_rgb(file_path):
     plt.tight_layout()
     plt.show()
 
+    imagem_original.close()
+
 def equalizar_intensidade(img,salvar):
     imagem = converter_RGB_HSV(img)    
     intensidade = np.array(imagem)[:,:,2]
@@ -122,6 +125,6 @@ def equalizar_intensidade(img,salvar):
 
     imagem_equalizada = Image.fromarray(imagem_equalizada, "RGB")
     imagem_equalizada.save(salvar)
-
+    imagem_equalizada.close()
     return histograma_intensidade(salvar) 
 

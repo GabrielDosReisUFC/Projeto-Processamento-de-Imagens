@@ -37,7 +37,7 @@ def converter_RGB_HSV(img):
         for coluna in range(imagem_original.width):
             r,g,b = imagem_original.getpixel((coluna,linha))
             nova_imagem.point((coluna,linha),fill=RGB_HSV(r,g,b))
-
+    imagem_original.close()
     return imagem_hsv
 
 def HSV_RGB(H,S,V):
@@ -92,7 +92,7 @@ def converter_HSV_RGB(img):
         for coluna in range(imagem_original.width):
             H,S,V = imagem_original.getpixel((coluna,linha))
             nova_imagem.point((coluna,linha),fill=HSV_RGB(H,S,V))
-
+    imagem_original.close()
     return imagem_rgb
 
 def converter_escala_cinza(img,salvar):
@@ -103,7 +103,7 @@ def converter_escala_cinza(img,salvar):
         for coluna in range(imagem_original.width):
             r,g,b = imagem_original.getpixel((coluna,linha))
             nova_imagem.point((coluna,linha),fill=(math.floor(r+g+b)//3))
-
+    imagem_original.close()
     imagem_cinza.save(salvar)
 
 def converter_escala_cinza_ponderada(img,salvar,peso1,peso2,peso3):
@@ -116,6 +116,9 @@ def converter_escala_cinza_ponderada(img,salvar,peso1,peso2,peso3):
             valor = (peso1*r+peso2*g+peso3*b)//(peso1+peso2+peso3)
             nova_imagem.point((coluna,linha),fill=math.floor(valor))
     imagem_cinza.save(salvar)
+    imagem_cinza.close()
+    imagem_original.close()
+
 
 def negativo(r,g,b):
     neg_r = 255 - r
@@ -133,6 +136,8 @@ def converter_negativo(img,salvar):
             nova_imagem.point((coluna,linha),fill=negativo(r,g,b))
 
     imagem_cinza.save(salvar)
+    imagem_cinza.close()
+    imagem_original.close()
 
 def serpia(r,g,b):
     serpia_r = (0.393 * r + 0.769 * g + 0.189 * b)
@@ -151,3 +156,5 @@ def converter_serpia(img,salvar):
             nova_imagem.point((coluna,linha),fill=serpia(r,g,b))
 
     imagem_cinza.save(salvar)
+    imagem_cinza.close()
+    imagem_original.close()

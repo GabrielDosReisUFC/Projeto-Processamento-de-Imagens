@@ -18,7 +18,9 @@ def convolucao(img, kernel,salvar):
                       accumulator += pixel_value * kernel[i + padding, j + padding]
             nova_imga[y][x] = accumulator
     imga = Image.fromarray(nova_imga/np.max(np.max(nova_imga))* 255)
+    imga.save(salvar)
     imga.close()
+    image.close()
 
 def convolucao_media(img,tam,salvar):
     matrix = np.ones((tam,tam),dtype=int) * pow(tam,2)
@@ -44,6 +46,7 @@ def convoluca_mediana(path, tam,salvar):
     imga = Image.fromarray(nova_imga/np.max(np.max(nova_imga))* 255)
     imga.save(salvar)
     imga.close()
+    image.close()
 
 def laplaciano(img,salvar):
     image = Image.open(img)
@@ -65,6 +68,7 @@ def laplaciano(img,salvar):
     imga = Image.fromarray(nova_imga)
     imga.save(salvar)
     imga.close()
+    image.close()
 
 def gauss(img,num):
     image = Image.open(img)
@@ -86,7 +90,7 @@ def gauss(img,num):
             nova_imga[y][x] = accumulator
     
     nova_imga = nova_imga/np.max(np.max(nova_imga)) *255
-    imagem_final = Image.fromarray(nova_imga)
+    image.close()
     return nova_imga
  
 def high_boost(imagem,salvar):
@@ -98,6 +102,8 @@ def high_boost(imagem,salvar):
     img_3 = img + 1.2*img_2
     img_final = Image.fromarray(img_3/np.max(np.max(img_3))* 255)
     img_final.save(salvar)
+    img_final.close()
+    img.close()
 
 def sobel_x(img):
     image = Image.open(img)
@@ -115,7 +121,7 @@ def sobel_x(img):
                       pixel_value = image.getpixel((x + i, y + j))
                       accumulator += pixel_value * kernel[i + padding, j + padding]
             nova_imga[y][x] = accumulator
-
+    image.close()
     return nova_imga
 
 def sobel_y(img):
@@ -134,7 +140,7 @@ def sobel_y(img):
                       pixel_value = image.getpixel((x + i, y + j))
                       accumulator += pixel_value * kernel[i + padding, j + padding]
             nova_imga[y][x] = accumulator
-
+    image.close()
     return nova_imga
 
 def sobel(img,salvar):
@@ -143,6 +149,7 @@ def sobel(img,salvar):
     img_final = abs(x) + abs(y)
     nova_imga = Image.fromarray(img_final/np.max(np.max(img_final))* 255)
     nova_imga.save(salvar)
+    nova_imga.close()
 
 def convolucao_rgb(img, kernel,salvar):
     image = Image.open(img)
@@ -166,6 +173,8 @@ def convolucao_rgb(img, kernel,salvar):
             pixels_suavizados[x,y] = (accumulator_r,accumulator_g,accumulator_b)
 
     imagem_suavizada.save(salvar)
+    image.close()
+    imagem_suavizada.close()
 
 def suavizacao_rgb(img,salvar):
     kernel = np.array([[1, 1, 1], [1, 1, 1,], [1, 1, 1]])*1/9

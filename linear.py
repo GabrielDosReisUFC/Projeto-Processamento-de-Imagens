@@ -65,7 +65,7 @@ def linearizar(image_path,salvar):
                 dicionario[points[i][0]] = (m,n)
 
     img_aux = Image.open(image_path)
-    if img_aux.mode == "RGB" or "HSV":
+    if img_aux.mode == "RGB" or img_aux.mode == "HSV":
         imagem = Image.new('RGB',(img_aux.width,img_aux.height))
         nova_imagem = ImageDraw.Draw(imagem)
         for linha in range(img_aux.height):
@@ -89,11 +89,6 @@ def linearizar(image_path,salvar):
                 for i in dicionario.keys():
                     if pixel <= i:
                         pixel = math.floor(pixel*dicionario[i][0] + dicionario[i][1])
-                # Atualize o pixel na imagem
                 img_aux.putpixel((x, y), pixel)
-                # Salve a imagem resultante
         img_aux.save(salvar)
         img_aux.close()
-        img = Image.open(salvar)
-        img.save(image_path)
-        img.close()

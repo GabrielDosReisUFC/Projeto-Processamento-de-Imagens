@@ -37,3 +37,5 @@ def transformacao_logaritmica_RGB(path,salvar):
     imagem_transformada_array = (imagem_transformada_array / np.max(imagem_transformada_array) * 255).astype(np.uint8)
     imagem_transformada = Image.fromarray(imagem_transformada_array)
     imagem_transformada.save(salvar)
+    imagem_transformada.close()
+    imagem.close()

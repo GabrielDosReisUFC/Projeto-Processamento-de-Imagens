@@ -91,13 +91,9 @@ class Application:
         self.frame_aux = Frame(root)
         self.frame_aux.pack(fill=BOTH,expand=True,padx=5,pady=5)
         self.text_area = Text(self.frame_aux)
-        # self.frame_text.pack()
-        # text_area = Text(self.frame_text, wrap = WORD, height=8, width=30)
+
         self.text_area.pack(fill=BOTH,expand=True)
 
-        # self.frame3.grid_rowconfigure(0, weight=1)
-        # self.frame3.grid_columnconfigure(0, weight=1)
-        # self.frame3.grid_columnconfigure(1, weight=1)
 
         self.Path_img = None
         self.Path_img_2 = None
@@ -111,8 +107,6 @@ class Application:
         self.root.title("Editor de Imagens")
         self.root.configure(background = "#1A1A1A")
         self.root.resizable(True,True)
-        # Width = self.root.winfo_screenwidth()
-        # height = self.root.winfo_screenheight()
         Width = 900
         height = 650
         self.root.geometry("%dx%d" % (Width,height))
@@ -152,8 +146,6 @@ class Application:
             self.Top_level.geometry("%dx%d" % (largura,altura))
             self.Top_level.protocol("WM_DELETE_WINDOW", self.fechar_janela_toplevel)
             
-            # self.label_img = Label(self.frame1,image=self.img)
-            # self.label_img.place(relx = 0, rely= 0)
         
         self.Path_img = path
 
@@ -204,8 +196,11 @@ def aplicar_gamma(tela,Path_img):
     if Path_img:
         gamma = pergunta_gamma()
         if gamma is not None:
-            correcao_gamma.gamma(Path_img,gamma,caminho_modificado)
-            Application.display_image(tela,caminho_modificado)
+            resposta = correcao_gamma.gamma(Path_img,gamma,caminho_modificado)
+            if resposta == True:
+                Application.display_image(tela,caminho_modificado)
+            else:
+                messagebox.showinfo("Alerta","Erro ao aplicar o gamma")
     else:
         messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
 
@@ -322,8 +317,8 @@ def aplicar_filtros(tela,Path_img,colorido):
     matrix_kernel = None
     
     def escolher_tamanho():
-        resposta = simpledialog.askinteger("Valor","Insira o tamanho da matriz (máximo 9)")
-        if resposta > 9 or resposta < 0:
+        resposta = simpledialog.askinteger("Valor","Insira o tamanho da matriz (máximo 9 e número quadrado impar)")
+        if resposta != 3 and resposta!=5 and resposta!=7 and resposta!=9:
             messagebox.showinfo("Alerta","Valor inserido é inválido")
             return None
         else:
@@ -350,7 +345,6 @@ def aplicar_filtros(tela,Path_img,colorido):
             for entry in linha:
                 valor = float(entry.get())
                 valores_linhas.append(valor)
-            #  = [entry.get() for entry in linha]
             matrix_kernel.append(np.array(valores_linhas))
         janela.destroy()
         matrix_kernel = np.array(matrix_kernel)
@@ -364,13 +358,16 @@ def aplicar_filtros(tela,Path_img,colorido):
         opcao_selecionada = opcao.get()
         if opcao_selecionada == "Generico" or opcao_selecionada == "ponderada":
             resposta = escolher_tamanho()
-            for widget in top_level.winfo_children():
-                widget.destroy()
-            definir_kernel(resposta,top_level,colorido)
+            if resposta != None:
+                for widget in top_level.winfo_children():
+                    widget.destroy()
+                definir_kernel(resposta,top_level,colorido)
+            else:
+                top_level.destroy()
         else:
             try:
                 if opcao_selecionada == "simples":
-                    resposta = escolher_tamanho()
+                    resposta = escolher_tamanho()                    
                     if resposta is not None:
                         filtro.convolucao_media(Path_img,resposta,caminho_modificado)
                 if opcao_selecionada == "mediana":
@@ -396,7 +393,7 @@ def aplicar_filtros(tela,Path_img,colorido):
                 Application.display_image(tela,caminho_modificado)
                 top_level.destroy()
             except:
-                messagebox.showinfo("Alerta","formato inválido")
+                messagebox.showinfo("Alerta","formato inválido.")
                 
     top_level = Toplevel()
     top_level .title("Selecione uma opção")
@@ -558,10 +555,13 @@ def aplicar_ajustes(tela,Path_img,colorido):
     else:
         messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
 
-def aplicar_sepia(tela,Path_img):
+def aplicar_sepia(tela,Path_img,colorido):
     if Path_img:
-        conversao.converter_serpia(Path_img,caminho_modificado)
-        Application.display_image(tela,caminho_modificado)
+        if colorido:
+            messagebox.showinfo("Alerta","Formato inválido")
+        else:
+            conversao.converter_serpia(Path_img,caminho_modificado)
+            Application.display_image(tela,caminho_modificado)
     else:
         messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
 

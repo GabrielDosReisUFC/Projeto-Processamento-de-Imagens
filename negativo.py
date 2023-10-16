@@ -24,6 +24,8 @@ def negativo_RGB(img,salvar):
             nova_imagem.point((coluna,linha),fill=negativo(r,g,b))
 
     imagem_cinza.save(salvar)
+    imagem_cinza.close()
+    imagem_original.close()
 
 def negativo_simples(path,salvar):
     img = Image.open(path)

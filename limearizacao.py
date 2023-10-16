@@ -27,6 +27,7 @@ def limearizar_RGB(image_path,valor,salvar):
     imagem_modificada = Image.fromarray(imagem_modificada_array)
     image.close()
     imagem_modificada.save(salvar)
+    imagem_modificada.close()
     
 
 def limearizar_simples(image_path,valor,salvar):
