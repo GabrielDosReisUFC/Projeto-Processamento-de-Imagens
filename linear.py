@@ -54,19 +54,18 @@ def linearizar(image_path,salvar):
         ultimo_valor = points[len(points)-1]
         ultimo_valor[0] != 255
         points.append((255,255))
-    # print(points)
     dicionario = {}
     for i in range(len(points)):
         if i != 0:
-            m = (points[i][1] - points[i-1][1]) / (points[i][0] - points[i-1][0])
-            n = points[i][1] - m*points[i][0]
-            dicionario[points[i][0]] = (m,n)
+            delta_y = (points[i][1] - points[i-1][1])
+            delta_x = (points[i][0] - points[i-1][0])
+            if delta_x != 0:
+                m = delta_y/delta_x
+                n = points[i][1] - m*points[i][0]
+                dicionario[points[i][0]] = (m,n)
 
-    # Abra a imagem .tif
     img_aux = Image.open(image_path)
-    if img_aux.mode == "RGB" or "HSV":
-        for i in dicionario.keys():
-           print(dicionario[i][0],dicionario[i][1])
+    if img_aux.mode == "RGB" or img_aux.mode == "HSV":
         imagem = Image.new('RGB',(img_aux.width,img_aux.height))
         nova_imagem = ImageDraw.Draw(imagem)
         for linha in range(img_aux.height):
@@ -90,11 +89,6 @@ def linearizar(image_path,salvar):
                 for i in dicionario.keys():
                     if pixel <= i:
                         pixel = math.floor(pixel*dicionario[i][0] + dicionario[i][1])
-                # Atualize o pixel na imagem
                 img_aux.putpixel((x, y), pixel)
-                # Salve a imagem resultante
         img_aux.save(salvar)
         img_aux.close()
-        img = Image.open(salvar)
-        img.save(image_path)
-        img.close()

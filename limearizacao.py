@@ -24,21 +24,17 @@ def limearizar_RGB(image_path,valor,salvar):
 
     imagem_modificada_array = np.stack((canal_r, canal_g, canal_b), axis=-1)
 
-    # Crie uma imagem PIL a partir do array resultante
     imagem_modificada = Image.fromarray(imagem_modificada_array)
     image.close()
-    # Salve a imagem modificada
     imagem_modificada.save(salvar)
+    imagem_modificada.close()
     
 
 def limearizar_simples(image_path,valor,salvar):
     img_aux = Image.open(image_path)
-    # dados_imagem = np.array(image_path)
     for x in range(img_aux.height):
         for y in range(img_aux.width):
-            # print(x,y)
             pixel = int(img_aux.getpixel((y, x)))
-            # if round(dados_imagem[x,y]) < valor:
             if pixel <= valor:
                 img_aux.putpixel((y, x), 0)
             else:
@@ -46,5 +42,3 @@ def limearizar_simples(image_path,valor,salvar):
     
     img_aux.save(salvar)
     img_aux.close()
-
-limearizar_RGB("cubo.tif",254,"modificado.tif")

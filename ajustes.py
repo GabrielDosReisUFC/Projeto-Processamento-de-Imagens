@@ -1,6 +1,5 @@
 import rgb2hsv
 from PIL import Image,ImageDraw
-import numpy as np
 
 def ajuste_matiz(img,valor,salvar):
     imagem = Image.open(img)
@@ -11,8 +10,10 @@ def ajuste_matiz(img,valor,salvar):
         for coluna in range(imagem_hsv.width):
             H,S,V = imagem_hsv.getpixel((coluna,linha))
             H = (H+valor)*360/100 
-            nova_imagem.point((coluna,linha),fill=rgb2hsv.hsv2rgb(H,S,V))
+            nova_imagem.point((coluna,linha),fill=conversao.HSV_RGB(H,S,V))
     imagem_nova.save(salvar)
+    imagem_nova.close()
+    imagem_hsv.close()
 
 def ajuste_saturacao(img,valor,salvar):
     imagem = Image.open(img)
@@ -24,7 +25,8 @@ def ajuste_saturacao(img,valor,salvar):
             H,S,V = imagem_hsv.getpixel((coluna,linha))
             nova_imagem.point((coluna,linha),fill=rgb2hsv.hsv2rgb(H,S+valor,V))
     imagem_nova.save(salvar)
-
+    imagem_hsv.close()
+    imagem_nova.close()
 
 def ajuste_brilho(img,valor,salvar):
     imagem = Image.open(img)
@@ -35,12 +37,15 @@ def ajuste_brilho(img,valor,salvar):
         for coluna in range(imagem_hsv.width):
             H,S,V = imagem_hsv.getpixel((coluna,linha))
             if V+valor <=0:
-                nova_imagem.point((coluna,linha),fill=rgb2hsv.hsv2rgb(H,S,0))
+                nova_imagem.point((coluna,linha),fill=conversao.HSV_RGB(H,S,0))
             elif V+valor >= 100:
-                nova_imagem.point((coluna,linha),fill=rgb2hsv.hsv2rgb(H,S,100))
+                nova_imagem.point((coluna,linha),fill=conversao.HSV_RGB(H,S,100))
             else:
                 nova_imagem.point((coluna,linha),fill=rgb2hsv.hsv2rgb(H,S,V+valor))
     imagem_nova.save(salvar)
+    imagem_hsv.close()
+    imagem_nova.close()
+
 
 def ajuste_R(img,valor,salvar):
     imagem = Image.open(img)
@@ -56,6 +61,8 @@ def ajuste_R(img,valor,salvar):
             else:
                 nova_imagem.point((coluna,linha),fill=(R+valor,G,B))
     imagem_nova.save(salvar)
+    imagem.close()
+    imagem_nova.close()
 
 
 def ajuste_G(img,valor,salvar):
@@ -72,6 +79,8 @@ def ajuste_G(img,valor,salvar):
             else:
                 nova_imagem.point((coluna,linha),fill=(R,G+valor,B))
     imagem_nova.save(salvar)
+    imagem.close()
+    imagem_nova.close()
 
 
 def ajuste_B(img,valor,salvar):
@@ -90,3 +99,5 @@ def ajuste_B(img,valor,salvar):
             else:
                 nova_imagem.point((coluna,linha),fill=(R,G,B+valor))
     imagem_nova.save(salvar)
+    imagem.close()
+    imagem_nova.close()

@@ -35,12 +35,7 @@ class Application:
         self.bt_salvar_imagem = Button(self.frame_superior, width=10, height=1, compound="c", text="Salvar imagem", command=lambda:self.salvar_imagem())
         self.bt_salvar_imagem.pack(side='left', padx=5,pady=5)
 
-        # self.frame1 = Frame(self.root)
-        # self.frame1.place(relx= 0.181, rely= 0.037, relwidth= 1, relheight= 0.97)
-        # self.frame1.pack()
-
         self.frame_esquerdo = Frame(self.root, background="#58317F")
-        # self.frame2.place(relx = 0, rely= 0.035, relwidth= 0.3, relheight= 0.5 )
         self.frame_esquerdo.pack(fill='y',side="left")
 
         self.frame3 = Frame(self.frame_esquerdo)
@@ -70,7 +65,7 @@ class Application:
         self.bt8 = Button(self.frame3, width=30, height=1, compound="c", text="Linear definido por partes", command=lambda:aplicar_linear(self,self.Path_img))
         self.bt8.grid(row=8,column=0,ipadx = 5, ipady= 5 )
         
-        self.bt9 = Button(self.frame3, width=30, height=1, compound="c", text="Filtros", command=lambda:aplicar_filtros(self,self.Path_img))
+        self.bt9 = Button(self.frame3, width=30, height=1, compound="c", text="Filtros", command=lambda:aplicar_filtros(self,self.Path_img,self.colorido))
         self.bt9.grid(row=9,column=0,ipadx = 5, ipady= 5 )
 
         self.bt10 = Button(self.frame3, width=30, height=1, compound="c", text="Escala de cinza", command=lambda:aplicar_converter_escala_cinza(self,self.Path_img,self.colorido))
@@ -97,13 +92,9 @@ class Application:
         self.frame_aux = Frame(root)
         self.frame_aux.pack(fill=BOTH,expand=True,padx=5,pady=5)
         self.text_area = Text(self.frame_aux)
-        # self.frame_text.pack()
-        # text_area = Text(self.frame_text, wrap = WORD, height=8, width=30)
+
         self.text_area.pack(fill=BOTH,expand=True)
 
-        # self.frame3.grid_rowconfigure(0, weight=1)
-        # self.frame3.grid_columnconfigure(0, weight=1)
-        # self.frame3.grid_columnconfigure(1, weight=1)
 
         self.Path_img = None
         self.Path_img_2 = None
@@ -117,8 +108,6 @@ class Application:
         self.root.title("Editor de Imagens")
         self.root.configure(background = "#1A1A1A")
         self.root.resizable(True,True)
-        # Width = self.root.winfo_screenwidth()
-        # height = self.root.winfo_screenheight()
         Width = 900
         height = 650
         self.root.geometry("%dx%d" % (Width,height))
@@ -158,8 +147,6 @@ class Application:
             self.Top_level.geometry("%dx%d" % (largura,altura))
             self.Top_level.protocol("WM_DELETE_WINDOW", self.fechar_janela_toplevel)
             
-            # self.label_img = Label(self.frame1,image=self.img)
-            # self.label_img.place(relx = 0, rely= 0)
         
         self.Path_img = path
 
@@ -210,8 +197,11 @@ def aplicar_gamma(tela,Path_img):
     if Path_img:
         gamma = pergunta_gamma()
         if gamma is not None:
-            correcao_gamma.gamma(Path_img,gamma,caminho_modificado)
-            Application.display_image(tela,caminho_modificado)
+            resposta = correcao_gamma.gamma(Path_img,gamma,caminho_modificado)
+            if resposta == True:
+                Application.display_image(tela,caminho_modificado)
+            else:
+                messagebox.showinfo("Alerta","Erro ao aplicar o gamma")
     else:
         messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
 
@@ -323,18 +313,19 @@ def aplicar_linear(tela,Path_img):
     else:
         messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
 
-def aplicar_filtros(tela,Path_img):
+def aplicar_filtros(tela,Path_img,colorido):
     global matrix_kernel
     matrix_kernel = None
+    
     def escolher_tamanho():
-        resposta = simpledialog.askinteger("Valor","Insira o tamanho da matriz (máximo 9)")
-        if resposta > 9 or resposta < 0:
+        resposta = simpledialog.askinteger("Valor","Insira o tamanho da matriz (máximo 9 e número quadrado impar)")
+        if resposta != 3 and resposta!=5 and resposta!=7 and resposta!=9:
             messagebox.showinfo("Alerta","Valor inserido é inválido")
             return None
         else:
             return resposta
 
-    def definir_kernel(tamanho,janela):
+    def definir_kernel(tamanho,janela,colorido):
         matrix = []
         janela.title("Digite a Matriz")
         for i in range(tamanho):
@@ -344,10 +335,10 @@ def aplicar_filtros(tela,Path_img):
                 entry.grid(row=i,column=j)
                 linha.append(entry)
             matrix.append(linha)
-        botao = ttk.Button(janela, text="Salvar Matriz", command=lambda:enviar_conteudo_matriz(matrix,janela))
+        botao = ttk.Button(janela, text="Salvar Matriz", command=lambda:enviar_conteudo_matriz(matrix,janela,colorido))
         botao.grid(row=tamanho, columnspan=tamanho)
     
-    def enviar_conteudo_matriz(matrix,janela):
+    def enviar_conteudo_matriz(matrix,janela,colorido):
         global matrix_kernel
         matrix_kernel=[]
         for linha in matrix:
@@ -355,48 +346,56 @@ def aplicar_filtros(tela,Path_img):
             for entry in linha:
                 valor = float(entry.get())
                 valores_linhas.append(valor)
-            #  = [entry.get() for entry in linha]
             matrix_kernel.append(np.array(valores_linhas))
         janela.destroy()
         matrix_kernel = np.array(matrix_kernel)
-        filtro.convolucao(Path_img,matrix_kernel,caminho_modificado)
+        if colorido == False:
+            filtro.convolucao(Path_img,matrix_kernel,caminho_modificado)
+        else:
+            filtro.convolucao_rgb(Path_img,matrix_kernel,caminho_modificado)
         Application.display_image(tela,caminho_modificado)
 
-    def escolha():
+    def escolha(colorido):
         opcao_selecionada = opcao.get()
         if opcao_selecionada == "Generico" or opcao_selecionada == "ponderada":
             resposta = escolher_tamanho()
-            for widget in top_level.winfo_children():
-                widget.destroy()
-            definir_kernel(resposta,top_level)
+            if resposta != None:
+                for widget in top_level.winfo_children():
+                    widget.destroy()
+                definir_kernel(resposta,top_level,colorido)
+            else:
+                top_level.destroy()
         else:
-            if opcao_selecionada == "simples":
-                resposta = escolher_tamanho()
-                if resposta is not None:
-                    filtro.convolucao_media(Path_img,resposta,caminho_modificado)
-            if opcao_selecionada == "mediana":
-                resposta = escolher_tamanho()
-                if resposta is not None:
-                    filtro.convoluca_mediana(Path_img,resposta,caminho_modificado)
-            if opcao_selecionada == "laplaciano":
-                filtro.laplaciano(Path_img,caminho_modificado)
-            if opcao_selecionada == "high":
-                filtro.high_bost(Path_img,caminho_modificado)
-            if opcao_selecionada == "x":
-                img = filtro.sorbel_x(Path_img)
-                img.save(caminho_modificado)
-            if opcao_selecionada == "y":
-                img = filtro.sorbel_y(Path_img)
-                img.save(caminho_modificado)
-            if opcao_selecionada == "magnitude":
-                filtro.sorbel(Path_img,caminho_modificado)
-            if opcao_selecionada == "suavizacao":
-                filtro.suavizacao_rgb(Path_img,caminho_modificado)
-            if opcao_selecionada == "agucamento":
-                filtro.agucamento_rgb(Path_img,caminho_modificado)
-            Application.display_image(tela,caminho_modificado)
-            top_level.destroy()
-
+            try:
+                if opcao_selecionada == "simples":
+                    resposta = escolher_tamanho()                    
+                    if resposta is not None:
+                        filtro.convolucao_media(Path_img,resposta,caminho_modificado)
+                if opcao_selecionada == "mediana":
+                    resposta = escolher_tamanho()
+                    if resposta is not None:
+                        filtro.convoluca_mediana(Path_img,resposta,caminho_modificado)
+                if opcao_selecionada == "laplaciano":
+                    filtro.laplaciano(Path_img,caminho_modificado)
+                if opcao_selecionada == "high":
+                    filtro.high_bost(Path_img,caminho_modificado)
+                if opcao_selecionada == "x":
+                    img = filtro.sobel_x(Path_img)
+                    img.save(caminho_modificado)
+                if opcao_selecionada == "y":
+                    img = filtro.sobel_y(Path_img)
+                    img.save(caminho_modificado)
+                if opcao_selecionada == "magnitude":
+                    filtro.sobel(Path_img,caminho_modificado)
+                if opcao_selecionada == "suavizacao":
+                    filtro.suavizacao_rgb(Path_img,caminho_modificado)
+                if opcao_selecionada == "agucamento":
+                    filtro.agucamento_rgb(Path_img,caminho_modificado)
+                Application.display_image(tela,caminho_modificado)
+                top_level.destroy()
+            except:
+                messagebox.showinfo("Alerta","formato inválido.")
+                
     top_level = Toplevel()
     top_level .title("Selecione uma opção")
     opcao = StringVar()
@@ -424,7 +423,7 @@ def aplicar_filtros(tela,Path_img):
     op_10.pack()
     op_11.pack()
 
-    show_button = ttk.Button(top_level, text="Escolher", command=lambda:escolha())
+    show_button = ttk.Button(top_level, text="Escolher", command=lambda:escolha(colorido))
     show_button.pack()
 
 def validar_numero(numero):
@@ -491,11 +490,11 @@ def aplicar_converter_escala_cinza(tela,Path_img,colorido):
 def escolha_ajutes(tela,Path_img,janela,opcao):
     janela.destroy()
     if opcao == 1:
-        # try:
-        resposta = simpledialog.askinteger("Valor","Insira um valor de -100 a 100")
-        ajustes.ajuste_matiz(Path_img,resposta,caminho_modificado)
-        # except:
-            # messagebox.showinfo("Alerta","Você deve inserir um valor válido")
+        try:
+            resposta = simpledialog.askinteger("Valor","Insira um valor de -100 a 100")
+            ajustes.ajuste_matiz(Path_img,resposta,caminho_modificado)
+        except:
+            messagebox.showinfo("Alerta","Você deve inserir um valor válido")
     elif opcao == 2:
         try:
             resposta = simpledialog.askinteger("Valor","Insira um valor de -100 a 100")
@@ -569,10 +568,13 @@ def aplicar_chroma(tela,Path_img):
     else:
         messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
 
-def aplicar_sepia(tela,Path_img):
+def aplicar_sepia(tela,Path_img,colorido):
     if Path_img:
-        conversao.converter_sepia(Path_img,caminho_modificado)
-        Application.display_image(tela,caminho_modificado)
+        if colorido:
+            messagebox.showinfo("Alerta","Formato inválido")
+        else:
+            conversao.converter_sepia(Path_img,caminho_modificado)
+            Application.display_image(tela,caminho_modificado)
     else:
         messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
 
