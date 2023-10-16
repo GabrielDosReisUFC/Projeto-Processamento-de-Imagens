@@ -8,11 +8,14 @@ def inverter(path,salvar):
     else:
         negativo_simples(path,salvar)
 
-def negativo(r,g,b):
-    neg_r = 255 - r
-    neg_g = 255 - g
-    neg_b = 255 - b
-    return neg_r,neg_g,neg_b    
+def negativo_simples(path,salvar):
+    img = Image.open(path)
+    data = np.asarray(img) / 255.0
+    data = (1 - data)*255
+    img2 = Image.fromarray(data)
+    img.close()
+    img2.save(salvar)
+
 
 def negativo_RGB(img,salvar):
     imagem_original = Image.open(img)
@@ -21,6 +24,6 @@ def negativo_RGB(img,salvar):
     for linha in range(imagem_original.height):
         for coluna in range(imagem_original.width):
             r,g,b = imagem_original.getpixel((coluna,linha))
-            nova_imagem.point((coluna,linha),fill=negativo(r,g,b))
+            nova_imagem.point((coluna,linha),fill=negativo_simples(r,g,b))
 
     imagem_cinza.save(salvar)

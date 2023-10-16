@@ -80,21 +80,6 @@ def HSV_RGB(H,S,V):
 
     return math.floor(R),math.floor(G),math.floor(B)
 
-def converter_HSV_RGB(img):
-    try:
-        imagem_original = Image.open(img)
-    except:
-        imagem_original = img
-    pixels = imagem_original.load()
-    imagem_rgb = Image.new('RGB',(imagem_original.width,imagem_original.height))
-    nova_imagem = ImageDraw.Draw(imagem_rgb)
-    for linha in range(imagem_original.height):
-        for coluna in range(imagem_original.width):
-            H,S,V = imagem_original.getpixel((coluna,linha))
-            nova_imagem.point((coluna,linha),fill=HSV_RGB(H,S,V))
-
-    return imagem_rgb
-
 def converter_escala_cinza(img,salvar):
     imagem_original = Image.open(img)
     imagem_cinza = Image.new('L',(imagem_original.width,imagem_original.height))

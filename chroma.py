@@ -1,30 +1,33 @@
-import cv2 
+from PIL import Image
 import numpy as np
-from PIL import Image,ImageDraw
 
-def chromakey(img, imgfundo, gthreshold, salvar):
+def chromakey(img_path, background_path, gthreshold, salvar):
+    img = Image.open(img_path)
+    background = Image.open(background_path)
 
-    img=Image.open(img)
-    dim = (img.width ,img.height)
+    # Certifique-se de que as imagens de entrada tenham as mesmas dimensões
+    if img.size != background.size:
+        # Se as dimensões forem diferentes, redimensione a imagem de fundo
+        background = background.resize(img.size, Image.ANTIALIAS)
 
-    im_b,im_g,im_r = cv2.split(img)
+    img_array = np.array(img)
+    im_g = img_array[:, :, 1]
 
-    ret,im_thresh1 = cv2.threshold(im_g,255-gthreshold,255,cv2.THRESH_BINARY_INV)
+    im_thresh = (im_g > (255 - gthreshold)).astype(np.uint8) * 255
+    im_thresh = np.stack((im_thresh, im_thresh, im_thresh), axis=-1)
 
-    Im_RGB = cv2.cvtColor(im_thresh1,cv2.COLOR_GRAY2BGR)
+    im_noback = im_thresh * img_array
 
-    im_noback = cv2.bitwise_and(Im_RGB, img)
-
-    im_noback = cv2.cvtColor(im_noback,cv2.COLOR_BGR2RGB)
-
-    z = cv2.cvtColor(imgfundo,cv2.COLOR_BGR2RGB)
-
-    im_res = cv2.resize(z, dim, interpolation = cv2.INTER_AREA)
-
-    im_iv = 255 - Im_RGB
-
-    im_z_nofront = cv2.bitwise_and(im_res, im_iv)
+    background_array = np.array(background)
+    im_iv = 255 - im_thresh
+    im_z_nofront = im_iv * background_array
 
     im_final = im_z_nofront + im_noback
 
-    im_final.save(salvar)
+    # Converte a imagem resultante de volta para o formato PIL (Image)
+    im_final_pil = Image.fromarray(im_final.astype(np.uint8))
+
+    # Salva a imagem resultante
+    im_final_pil.save(salvar)
+
+
