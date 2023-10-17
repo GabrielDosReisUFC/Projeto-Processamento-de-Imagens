@@ -35,7 +35,9 @@ def converter_RGB_HSV(img):
     for linha in range(imagem_original.height):
         for coluna in range(imagem_original.width):
             r,g,b = imagem_original.getpixel((coluna,linha))
-            nova_imagem.point((coluna,linha),fill=RGB_HSV(r,g,b))
+            H ,S ,V = RGB_HSV(r,g,b)
+            H *= 100/360 
+            nova_imagem.point((coluna,linha),fill=(H,S,V))
     imagem_original.close()
     return imagem_hsv
 
@@ -90,6 +92,7 @@ def converter_HSV_RGB(img):
     for linha in range(imagem_original.height):
         for coluna in range(imagem_original.width):
             H,S,V = imagem_original.getpixel((coluna,linha))
+            H *=  360/100
             nova_imagem.point((coluna,linha),fill=HSV_RGB(H,S,V))
     imagem_original.close()
     return imagem_rgb

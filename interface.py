@@ -80,10 +80,10 @@ class Application:
         self.bt11 = Button(self.frame3, width=30, height=1, compound="c", text="Ajustes", command=lambda:aplicar_ajustes(self,self.Path_img,self.colorido))
         self.bt11.grid(row=12,column=0,ipadx = 5, ipady= 5 )
 
-        self.bt12 = Button(self.frame3, width=30, height=1, compound="c", text="Sepia", command=lambda:aplicar_sepia(self,self.Path_img))
+        self.bt12 = Button(self.frame3, width=30, height=1, compound="c", text="Sepia", command=lambda:aplicar_sepia(self,self.Path_img,self.colorido))
         self.bt12.grid(row=13,column=0,ipadx = 5, ipady= 5 )
 
-        self.bt13 = Button(self.frame3, width=30, height=1, compound="c", text="Chroma key", command=lambda:aplicar_chroma(self,self.Path_img))
+        self.bt13 = Button(self.frame3, width=30, height=1, compound="c", text="Chroma key", command=lambda:aplicar_chroma(self,self.Path_img,self.colorido))
         self.bt13.grid(row=14,column=0,ipadx = 5, ipady= 5 )
 
         self.bt14 = Button(self.frame3, width=30, height=1, compound="c", text="Rotação", command=lambda:aplicar_rotacao(self,self.Path_img))
@@ -385,7 +385,7 @@ def aplicar_filtros(tela,Path_img,colorido):
                 if opcao_selecionada == "laplaciano":
                     filtro.laplaciano(Path_img,caminho_modificado)
                 if opcao_selecionada == "high":
-                    filtro.high_bost(Path_img,caminho_modificado)
+                    filtro.high_boost(Path_img,caminho_modificado)
                 if opcao_selecionada == "x":
                     img = filtro.sobel_x(Path_img)
                     img.save(caminho_modificado)
@@ -564,26 +564,27 @@ def aplicar_ajustes(tela,Path_img,colorido):
     else:
         messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
 
-def aplicar_chroma(tela,Path_img):
+def aplicar_chroma(tela,Path_img,colorido):
     if Path_img:
-            valor = pergunta_limiar()
+        if not colorido:
+            valor = pergunta_limiar()   
             imgfundo = filedialog.askopenfilename(title="Selecione uma Imagem para background", filetypes=[("Imagens", "*.jpg *.png *.jpeg *.tif *.tiff *.bmp")])
             chroma.chromakey(Path_img, imgfundo, valor,caminho_modificado)
             Application.display_image(tela,caminho_modificado)
+        else:
+            messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")   
     else:
         messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
 
 def aplicar_sepia(tela,Path_img,colorido):
     if Path_img:
-        if colorido:
+        if not colorido:
             messagebox.showinfo("Alerta","Formato inválido")
         else:
             conversao.converter_sepia(Path_img,caminho_modificado)
             Application.display_image(tela,caminho_modificado)
     else:
         messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
-
-
 
 def aplicar_rotacao(tela,Path_img):
     if Path_img:
