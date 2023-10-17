@@ -27,6 +27,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 
 caminho_modificado = os.getcwd()  + "\modificado.tif"
+exibindo = os.getcwd()  + "\exibindo.tif"
 
 class Application:
 
@@ -129,6 +130,7 @@ class Application:
 
     def display_image(self,path):
         imagem = Image.open(path)
+        imagem.save(exibindo)
         if self.Top_level:
             self.label_img.config(image="")  # Fechar a imagem anterior
             self.img = None
@@ -137,15 +139,17 @@ class Application:
             self.Top_level.title("Imagem")
             self.Top_level.attributes('-topmost', 1)
             imagem.save(caminho_modificado)
-        if imagem.mode != 'RGB' and imagem.mode != 'HSV':
+        imagem.close()
+        imagem_exibida = Image.open(exibindo)
+        if imagem_exibida.mode != 'RGB' and imagem_exibida.mode != 'HSV':
             self.colorido = False
         else:
             self.colorido = True
-        self.img = ImageTk.PhotoImage(imagem)
+        self.img = ImageTk.PhotoImage(imagem_exibida)
         # self.nova_janela(self.img)
-        largura,altura = imagem.size
+        largura,altura = imagem_exibida.size
         if largura > self.root.winfo_screenwidth() or altura > self.root.winfo_screenheight():
-            imagem.show()   
+            imagem_exibida.show()   
             self.Top_level.destroy()
             self.Top_level = None 
         else:
@@ -154,7 +158,6 @@ class Application:
             self.Top_level.geometry("%dx%d" % (largura,altura))
             self.Top_level.protocol("WM_DELETE_WINDOW", self.fechar_janela_toplevel)
             
-        
         self.Path_img = path
 
     def normal(self,path):
@@ -438,42 +441,14 @@ def validar_numero(numero):
     pattern = r'^[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?$'
     return re.match(pattern, numero)
 
-def submeter(peso1,peso2,peso3,tela,Path_img,janela):
-    if validar_numero(peso1) and validar_numero(peso2) and validar_numero(peso3):
-        conversao.converter_escala_cinza_ponderada(Path_img,caminho_modificado,float(peso1),float(peso2),float(peso3))
-        Application.display_image(tela,caminho_modificado)
-        janela.destroy()
-    else:
-        messagebox.showinfo("Alerta","Pelo menos 1 número é inválido")
-def aplicar_converter_escala_cinza_ponderado(tela,Path_img):
-    if Path_img:
-        janela = Toplevel()
-        janela .title("informe os pesos")
-        peso1 = Entry(janela)
-        peso2 = Entry(janela)
-        peso3 = Entry(janela)
-        label1 = Label(janela,text="Peso para R")
-        label2 = Label(janela,text="Peso para G")
-        label3 = Label(janela,text="Peso para B")
-        peso1.grid(row=0,column=1,columnspan=2)
-        label1.grid(row=0,column=0)
-        peso2.grid(row=1,column=1,columnspan=2)
-        label2.grid(row=1,column=0)
-        peso3.grid(row=2,column=1,columnspan=2)
-        label3.grid(row=2,column=0)
-        
-        botao = Button(janela, text="Submeter", command=lambda:submeter(peso1.get(),peso2.get(),peso3.get(),tela,Path_img,janela))
-        botao.grid(row=3,column=0,columnspan=2)
-    else:
-        messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
-
 def escolha_escala_cinza(tela,Path_img,janela,opcao):
     janela.destroy()    
     if opcao == 1:        
         conversao.converter_escala_cinza(Path_img,caminho_modificado)
         Application.display_image(tela,caminho_modificado)
     elif opcao == 2:
-        aplicar_converter_escala_cinza_ponderado(tela,Path_img)
+        conversao.converter_escala_cinza_ponderada(Path_img,caminho_modificado)
+        Application.display_image(tela,caminho_modificado)
 
 def aplicar_converter_escala_cinza(tela,Path_img,colorido):
     if Path_img:
@@ -499,7 +474,7 @@ def escolha_ajutes(tela,Path_img,janela,opcao):
     janela.destroy()
     if opcao == 1:
         try:
-            resposta = simpledialog.askinteger("Valor","Insira um valor de -100 a 100")
+            resposta = simpledialog.askinteger("Valor","Insira um valor de -360 a 360")
             ajustes.ajuste_matiz(Path_img,resposta,caminho_modificado)
         except:
             messagebox.showinfo("Alerta","Você deve inserir um valor válido")
@@ -566,7 +541,7 @@ def aplicar_ajustes(tela,Path_img,colorido):
 
 def aplicar_chroma(tela,Path_img,colorido):
     if Path_img:
-        if not colorido:
+        if colorido:
             valor = pergunta_limiar()   
             imgfundo = filedialog.askopenfilename(title="Selecione uma Imagem para background", filetypes=[("Imagens", "*.jpg *.png *.jpeg *.tif *.tiff *.bmp")])
             chroma.chromakey(Path_img, imgfundo, valor,caminho_modificado)
@@ -676,7 +651,6 @@ def aplicar_fourier(tela,Path_img):
     else:
         messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
     
-
 #main
 root = Tk()
 Application(root)

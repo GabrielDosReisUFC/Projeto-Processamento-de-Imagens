@@ -36,7 +36,7 @@ def converter_RGB_HSV(img):
         for coluna in range(imagem_original.width):
             r,g,b = imagem_original.getpixel((coluna,linha))
             H ,S ,V = RGB_HSV(r,g,b)
-            H *= 100/360 
+            H = math.floor(H * 100/360)
             nova_imagem.point((coluna,linha),fill=(H,S,V))
     imagem_original.close()
     return imagem_hsv
