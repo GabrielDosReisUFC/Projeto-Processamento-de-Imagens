@@ -1,4 +1,4 @@
-from PIL import Image
+from PIL import Image,ImageDraw
 import numpy as np
 
 def inverter(path,salvar):
@@ -16,6 +16,8 @@ def negativo_simples(path,salvar):
     img.close()
     img2.save(salvar)
 
+def operacao(r,g,b):
+    return 255 - r, 255-g, 255-b
 
 def negativo_RGB(img,salvar):
     imagem_original = Image.open(img)
@@ -24,6 +26,6 @@ def negativo_RGB(img,salvar):
     for linha in range(imagem_original.height):
         for coluna in range(imagem_original.width):
             r,g,b = imagem_original.getpixel((coluna,linha))
-            nova_imagem.point((coluna,linha),fill=negativo_simples(r,g,b))
+            nova_imagem.point((coluna,linha),fill=operacao(r,g,b))
 
     imagem_cinza.save(salvar)

@@ -5,6 +5,9 @@ from tkinter import messagebox
 from tkinter import ttk
 from tkinter import messagebox
 from tkinter import Toplevel, StringVar, Radiobutton, Button, messagebox
+from tkinter import ttk
+from tkinter import messagebox
+from tkinter import Toplevel, StringVar, Radiobutton, Button, messagebox
 from PIL import Image, ImageTk
 import numpy as np
 import os
@@ -27,6 +30,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 
 caminho_modificado = os.getcwd()  + "\modificado.tif"
+exibindo = os.getcwd()  + "\exibindo.tif"
 
 class Application:
 
@@ -80,10 +84,10 @@ class Application:
         self.bt11 = Button(self.frame3, width=30, height=1, compound="c", text="Ajustes", command=lambda:aplicar_ajustes(self,self.Path_img,self.colorido))
         self.bt11.grid(row=12,column=0,ipadx = 5, ipady= 5 )
 
-        self.bt12 = Button(self.frame3, width=30, height=1, compound="c", text="Sepia", command=lambda:aplicar_sepia(self,self.Path_img))
+        self.bt12 = Button(self.frame3, width=30, height=1, compound="c", text="Sepia", command=lambda:aplicar_sepia(self,self.Path_img,self.colorido))
         self.bt12.grid(row=13,column=0,ipadx = 5, ipady= 5 )
 
-        self.bt13 = Button(self.frame3, width=30, height=1, compound="c", text="Chroma key", command=lambda:aplicar_chroma(self,self.Path_img))
+        self.bt13 = Button(self.frame3, width=30, height=1, compound="c", text="Chroma key", command=lambda:aplicar_chroma(self,self.Path_img,self.colorido))
         self.bt13.grid(row=14,column=0,ipadx = 5, ipady= 5 )
 
         self.bt14 = Button(self.frame3, width=30, height=1, compound="c", text="Rotação", command=lambda:aplicar_rotacao(self,self.Path_img))
@@ -129,22 +133,26 @@ class Application:
 
     def display_image(self,path):
         imagem = Image.open(path)
+        imagem.save(exibindo)
         if self.Top_level:
             self.label_img.config(image="")  # Fechar a imagem anterior
             self.img = None
         else:
             self.Top_level = Toplevel(self.root)  # Cria uma nova janela sobre a janela principal
             self.Top_level.title("Imagem")
+            self.Top_level.attributes('-topmost', 1)
             imagem.save(caminho_modificado)
-        if imagem.mode != 'RGB' and imagem.mode != 'HSV':
+        imagem.close()
+        imagem_exibida = Image.open(exibindo)
+        if imagem_exibida.mode != 'RGB' and imagem_exibida.mode != 'HSV':
             self.colorido = False
         else:
             self.colorido = True
-        self.img = ImageTk.PhotoImage(imagem)
+        self.img = ImageTk.PhotoImage(imagem_exibida)
         # self.nova_janela(self.img)
-        largura,altura = imagem.size
+        largura,altura = imagem_exibida.size
         if largura > self.root.winfo_screenwidth() or altura > self.root.winfo_screenheight():
-            imagem.show()   
+            imagem_exibida.show()   
             self.Top_level.destroy()
             self.Top_level = None 
         else:
@@ -153,12 +161,14 @@ class Application:
             self.Top_level.geometry("%dx%d" % (largura,altura))
             self.Top_level.protocol("WM_DELETE_WINDOW", self.fechar_janela_toplevel)
             
-        
         self.Path_img = path
 
     def normal(self,path):
         if self.Path_img:
             self.display_image(path)
+            imagem = Image.open(caminho_modificado)
+            imagem.save(caminho_modificado)
+            imagem.close()
         else:
             messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
 
@@ -177,8 +187,9 @@ class Application:
     def salvar_imagem(self):
         if self.Path_img_normal:
             file_path = filedialog.asksaveasfilename(defaultextension=".png",filetypes=[("Imagens", "*.jpg *.png *.jpeg *.tif *.tiff *.bmp")])
-            imagem = Image.open("modificado.tif")
+            imagem = Image.open(caminho_modificado)
             imagem.save(file_path)
+            imagem.close()
         else:
             messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
 
@@ -384,7 +395,7 @@ def aplicar_filtros(tela,Path_img,colorido):
                 if opcao_selecionada == "laplaciano":
                     filtro.laplaciano(Path_img,caminho_modificado)
                 if opcao_selecionada == "high":
-                    filtro.high_bost(Path_img,caminho_modificado)
+                    filtro.high_boost(Path_img,caminho_modificado)
                 if opcao_selecionada == "x":
                     img = filtro.sobel_x(Path_img)
                     img.save(caminho_modificado)
@@ -399,7 +410,8 @@ def aplicar_filtros(tela,Path_img,colorido):
                     filtro.agucamento_rgb(Path_img,caminho_modificado)
                 Application.display_image(tela,caminho_modificado)
                 top_level.destroy()
-            except:
+            except Exception as e:
+                print(e)
                 messagebox.showinfo("Alerta","formato inválido.")
                 
     top_level = Toplevel()
@@ -436,42 +448,14 @@ def validar_numero(numero):
     pattern = r'^[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?$'
     return re.match(pattern, numero)
 
-def submeter(peso1,peso2,peso3,tela,Path_img,janela):
-    if validar_numero(peso1) and validar_numero(peso2) and validar_numero(peso3):
-        conversao.converter_escala_cinza_ponderada(Path_img,caminho_modificado,float(peso1),float(peso2),float(peso3))
-        Application.display_image(tela,caminho_modificado)
-        janela.destroy()
-    else:
-        messagebox.showinfo("Alerta","Pelo menos 1 número é inválido")
-def aplicar_converter_escala_cinza_ponderado(tela,Path_img):
-    if Path_img:
-        janela = Toplevel()
-        janela .title("informe os pesos")
-        peso1 = Entry(janela)
-        peso2 = Entry(janela)
-        peso3 = Entry(janela)
-        label1 = Label(janela,text="Peso para R")
-        label2 = Label(janela,text="Peso para G")
-        label3 = Label(janela,text="Peso para B")
-        peso1.grid(row=0,column=1,columnspan=2)
-        label1.grid(row=0,column=0)
-        peso2.grid(row=1,column=1,columnspan=2)
-        label2.grid(row=1,column=0)
-        peso3.grid(row=2,column=1,columnspan=2)
-        label3.grid(row=2,column=0)
-        
-        botao = Button(janela, text="Submeter", command=lambda:submeter(peso1.get(),peso2.get(),peso3.get(),tela,Path_img,janela))
-        botao.grid(row=3,column=0,columnspan=2)
-    else:
-        messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
-
 def escolha_escala_cinza(tela,Path_img,janela,opcao):
     janela.destroy()    
     if opcao == 1:        
         conversao.converter_escala_cinza(Path_img,caminho_modificado)
         Application.display_image(tela,caminho_modificado)
     elif opcao == 2:
-        aplicar_converter_escala_cinza_ponderado(tela,Path_img)
+        conversao.converter_escala_cinza_ponderada(Path_img,caminho_modificado)
+        Application.display_image(tela,caminho_modificado)
 
 def aplicar_converter_escala_cinza(tela,Path_img,colorido):
     if Path_img:
@@ -497,7 +481,7 @@ def escolha_ajutes(tela,Path_img,janela,opcao):
     janela.destroy()
     if opcao == 1:
         try:
-            resposta = simpledialog.askinteger("Valor","Insira um valor de -100 a 100")
+            resposta = simpledialog.askinteger("Valor","Insira um valor de -360 a 360")
             ajustes.ajuste_matiz(Path_img,resposta,caminho_modificado)
         except:
             messagebox.showinfo("Alerta","Você deve inserir um valor válido")
@@ -505,13 +489,15 @@ def escolha_ajutes(tela,Path_img,janela,opcao):
         try:
             resposta = simpledialog.askinteger("Valor","Insira um valor de -100 a 100")
             ajustes.ajuste_saturacao(Path_img,resposta,caminho_modificado)
-        except:
+        except Exception as e:
+            print(e)
             messagebox.showinfo("Alerta","Você deve inserir um valor válido")
     elif opcao == 3:
         try:
             resposta = simpledialog.askinteger("Valor","Insira um valor de -100 a 100")
             ajustes.ajuste_brilho(Path_img,resposta,caminho_modificado)
-        except:
+        except Exception as e:
+            print(e)
             messagebox.showinfo("Alerta","Você deve inserir um valor válido")
     elif opcao == 4:
         try:
@@ -562,26 +548,43 @@ def aplicar_ajustes(tela,Path_img,colorido):
     else:
         messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
 
-def aplicar_chroma(tela,Path_img):
+def pergunta_chroma():
+    try:
+        menor = simpledialog.askinteger("Valor","Insira o menor valor")
+        maior = simpledialog.askinteger("Valor","Insira o maior valor")
+
+        if maior < menor or menor < 0 or maior < 0 or maior > 255 or menor > 255:
+            messagebox.showinfo("Alerta","Valor informado deve estar entre 0 e 255")
+            return None
+        return menor,maior
+    except:
+        messagebox.showinfo("Alerta","Valor informado é inválido")
+        return None
+    
+def aplicar_chroma(tela,Path_img,colorido):
     if Path_img:
-            valor = pergunta_limiar()
-            imgfundo = filedialog.askopenfilename(title="Selecione uma Imagem para background", filetypes=[("Imagens", "*.jpg *.png *.jpeg *.tif *.tiff *.bmp")])
-            chroma.chromakey(Path_img, imgfundo, valor,caminho_modificado)
-            Application.display_image(tela,caminho_modificado)
+        try:
+            if colorido:
+                menor,maior = pergunta_chroma()   
+                imgfundo = filedialog.askopenfilename(title="Selecione uma Imagem para background", filetypes=[("Imagens", "*.jpg *.png *.jpeg *.tif *.tiff *.bmp")])
+                chroma.chromakey(Path_img, imgfundo,menor,maior,caminho_modificado)
+                Application.display_image(tela,caminho_modificado)
+            else:
+                messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")   
+        except:
+            messagebox.showinfo("Alerta","Erro")
     else:
         messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
 
 def aplicar_sepia(tela,Path_img,colorido):
     if Path_img:
-        if colorido:
+        if not colorido:
             messagebox.showinfo("Alerta","Formato inválido")
         else:
             conversao.converter_sepia(Path_img,caminho_modificado)
             Application.display_image(tela,caminho_modificado)
     else:
         messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
-
-
 
 def aplicar_rotacao(tela,Path_img):
     if Path_img:
@@ -636,6 +639,12 @@ def aplicar_fourier(tela,Path_img):
         janela = Toplevel()
         janela .title("Selecione uma opção")
         opcao = StringVar()
+        opcao1 = Radiobutton(janela, text="Transformada discreta", variable=opcao, value="1")
+        opcao2 = Radiobutton(janela, text="Transformada rápida", variable=opcao, value="2")
+        opcao1.pack()
+        opcao2.pack()
+        botao = Button(janela, text="Selecionar", command=lambda:escolher_fourier(Path_img,janela,int(opcao.get())))
+        botao.pack()
         opcao1 = Radiobutton(janela, text="Transformada discreta", variable=opcao, value="1")
         opcao2 = Radiobutton(janela, text="Transformada rápida", variable=opcao, value="2")
         opcao1.pack()

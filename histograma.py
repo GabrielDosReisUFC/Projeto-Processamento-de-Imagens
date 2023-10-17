@@ -2,8 +2,7 @@ from tkinter import *
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.pyplot as plt
 import numpy as np
-from rgb2hsv import rgb2hsv
-from rgb2hsv import hsv2rgb
+import conversao
 from PIL import Image
 
 def contagem_de_pixels(height, width, dados_imagem):
@@ -19,10 +18,10 @@ def histograma(file_path):
     dados_imagem = np.array(imagem_original)
 
     contagem_pixel = contagem_de_pixels(imagem_original.height, imagem_original.width, dados_imagem) 
-
+    imagem_original.close()
     plt.plot(range(0,256),contagem_pixel)
     plt.show()
-    imagem_original.close()
+    
 
 def histograma_equalizado(file_path,salvar):
     
@@ -45,14 +44,14 @@ def histograma_equalizado(file_path,salvar):
             dados_imagem[linha,coluna] = round(255*acumulado[i]/pixel_total)
     
     img2 = Image.fromarray(dados_imagem)
-    imagem_original.close()
     img2.save(salvar)
     contagem_equalizada = contagem_de_pixels(img2.height,img2.width,np.array(img2))
+    imagem_original.close()
     img2.close()
     return contagem_equalizada
 
 def histograma_intensidade(img):
-    imagem = rgb2hsv.rgb2hsv(img)
+    imagem = conversao.converter_RGB_HSV(img)
     contagem_pixel_intensiade = [0]*101
     for linha in range(imagem.height):
         for coluna in range(imagem.width):
@@ -106,7 +105,7 @@ def histograma_rgb(file_path):
     imagem_original.close()
 
 def equalizar_intensidade(img,salvar):
-    imagem = rgb2hsv.rgb2hsv(img)    
+    imagem = conversao.converter_RGB_HSV(img)    
     intensidade = np.array(imagem)[:,:,2]
     contagem_pixel = histograma_intensidade(img) 
     acumulado = np.zeros(101,dtype=int)
@@ -119,7 +118,7 @@ def equalizar_intensidade(img,salvar):
 
     imagem_equalizada = imagem.copy()
     imagem_equalizada = Image.fromarray(np.array(imagem_equalizada), "HSV")
-    imagem_equalizada = rgb2hsv.hsv2rgb(imagem_equalizada)
+    imagem_equalizada = conversao.converter_HSV_RGB(imagem_equalizada)
     imagem_equalizada = np.array(imagem_equalizada)
     imagem_equalizada[:,:,2] = intensidade_normalizada * 255 / 100
 
