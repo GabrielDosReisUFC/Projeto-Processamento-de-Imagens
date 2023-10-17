@@ -477,7 +477,7 @@ def aplicar_converter_escala_cinza(tela,Path_img,colorido):
     else:
         messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
 
-def escolha_ajutes(tela,Path_img,janela,opcao):
+def escolha_ajustes(tela,Path_img,janela,opcao):
     janela.destroy()
     if opcao == 1:
         try:
@@ -550,8 +550,8 @@ def aplicar_ajustes(tela,Path_img,colorido):
 
 def pergunta_chroma():
     try:
-        menor = simpledialog.askinteger("Valor","Insira o menor valor")
-        maior = simpledialog.askinteger("Valor","Insira o maior valor")
+        menor = simpledialog.askfloat("Valor","Insira o menor valor")
+        maior = simpledialog.askfloat("Valor","Insira o maior valor")
 
         if maior < menor or menor < 0 or maior < 0 or maior > 255 or menor > 255:
             messagebox.showinfo("Alerta","Valor informado deve estar entre 0 e 255")
@@ -586,10 +586,32 @@ def aplicar_sepia(tela,Path_img,colorido):
     else:
         messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
 
+def escolha_rotacao(tela,Path_img,janela,opcao):
+    janela.destroy()
+    if opcao == 1:
+        # try:
+        resposta = simpledialog.askfloat("Valor","Insira o ângulo")
+        rotacao_escala.rotacao_nn(Path_img,resposta,caminho_modificado)
+        # except:
+            # messagebox.showinfo("Alerta","Você deve inserir um valor válido")
+    elif opcao == 2:
+        try:
+            resposta = simpledialog.askfloat("Valor","Insira o ângulo")
+            rotacao_escala.rotacao_linear(Path_img,resposta,caminho_modificado)
+        except:
+            messagebox.showinfo("Alerta","Você deve inserir um valor válido")
+
 def aplicar_rotacao(tela,Path_img):
     if Path_img:
-        resposta = simpledialog.askinteger("Valor","Insira o valor do ângulo")
-        rotacao_escala.rotacao(Path_img,resposta,caminho_modificado)
+        janela = Toplevel()
+        janela .title("Selecione uma opção")
+        opcao = StringVar()
+        opcao1 = Radiobutton(janela, text="Vizinho mais próximo", variable=opcao, value="1")
+        opcao2 = Radiobutton(janela, text="Linear", variable=opcao, value="2")
+        opcao1.pack()
+        opcao2.pack()
+        botao = Button(janela, text="Selecionar", command=lambda:escolha_escala(tela,Path_img,janela,int(opcao.get())))
+        botao.pack()
         Application.display_image(tela,caminho_modificado)
     else:
         messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
@@ -599,15 +621,17 @@ def aplicar_rotacao(tela,Path_img):
 def escolha_escala(tela,Path_img,janela,opcao):
     janela.destroy()
     if opcao == 1:
-        # try:
-        resposta = simpledialog.askinteger("Valor","Insira um valor de escala")
-        rotacao_escala.interpolacao_nn(Path_img,resposta,caminho_modificado)
-        # except:
-            # messagebox.showinfo("Alerta","Você deve inserir um valor válido")
+        try:
+            resposta = simpledialog.askfloat("Valor","Insira um valor de escala")
+            rotacao_escala.interpolacao_nn(Path_img,resposta,caminho_modificado)
+            Application.display_image(tela,caminho_modificado)
+        except:
+            messagebox.showinfo("Alerta","Você deve inserir um valor válido")
     elif opcao == 2:
         try:
-            resposta = simpledialog.askinteger("Valor","Insira um valor de escala")
+            resposta = simpledialog.askfloat("Valor","Insira um valor de escala")
             rotacao_escala.interpolacao_lin(Path_img,resposta,caminho_modificado)
+            Application.display_image(tela,caminho_modificado)
         except:
             messagebox.showinfo("Alerta","Você deve inserir um valor válido")
 
@@ -622,7 +646,6 @@ def aplicar_escala(tela,Path_img):
         opcao2.pack()
         botao = Button(janela, text="Selecionar", command=lambda:escolha_escala(tela,Path_img,janela,int(opcao.get())))
         botao.pack()
-        Application.display_image(tela,caminho_modificado)
     else:
         messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
 
