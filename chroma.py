@@ -11,13 +11,17 @@ def chromakey(path,path2,valor1,valor2,salvar):
     for i in range(img.height):
         for j in range(img.width):
             r,g,b = img_array[i,j]
-            if valor1 < g < valor2 :
+            r_g = int(r) - int(g) 
+            b_g = int(b) - int(g)
+            if r_g < 0 and b_g < 0 and valor1 <= g <= valor2 :
               if i < imagem_redimensionada.height and j < imagem_redimensionada.width:
                   img_array[i,j] = img_array2[i,j]
 
     img_final = Image.fromarray(img_array)
-    img_final.show()
     img_final.save(salvar)
+    img.close()
+    img2.close()
+    img_final.close()
     
 
 

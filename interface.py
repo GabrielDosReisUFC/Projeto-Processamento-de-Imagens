@@ -5,9 +5,6 @@ from tkinter import messagebox
 from tkinter import ttk
 from tkinter import messagebox
 from tkinter import Toplevel, StringVar, Radiobutton, Button, messagebox
-from tkinter import ttk
-from tkinter import messagebox
-from tkinter import Toplevel, StringVar, Radiobutton, Button, messagebox
 from PIL import Image, ImageTk
 import numpy as np
 import os
@@ -166,7 +163,7 @@ class Application:
     def normal(self,path):
         if self.Path_img:
             self.display_image(path)
-            imagem = Image.open(caminho_modificado)
+            imagem = Image.open(path)
             imagem.save(caminho_modificado)
             imagem.close()
         else:
@@ -180,9 +177,10 @@ class Application:
     
     def abrir_imagem(self):
         caminho_imagem = filedialog.askopenfilename(title="Selecione uma Imagem", filetypes=[("Imagens", "*.jpg *.png *.jpeg *.tif *.tiff *.bmp")])
-        self.Path_img_normal = caminho_imagem
-        if caminho_imagem:
-            self.display_image(caminho_imagem)
+        if caminho_imagem != None:
+            self.Path_img_normal = caminho_imagem
+            if caminho_imagem:
+                self.display_image(caminho_imagem)
 
     def salvar_imagem(self):
         if self.Path_img_normal:
@@ -570,7 +568,7 @@ def aplicar_chroma(tela,Path_img,colorido):
                 chroma.chromakey(Path_img, imgfundo,menor,maior,caminho_modificado)
                 Application.display_image(tela,caminho_modificado)
             else:
-                messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")   
+                messagebox.showinfo("Alerta","formato invalido")   
         except:
             messagebox.showinfo("Alerta","Erro")
     else:
@@ -705,7 +703,6 @@ def aplicar_fourier(tela,Path_img):
     else:
         messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
     
-
 #main
 root = Tk()
 Application(root)
