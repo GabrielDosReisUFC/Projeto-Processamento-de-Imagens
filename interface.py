@@ -541,15 +541,31 @@ def aplicar_ajustes(tela,Path_img,colorido):
     else:
         messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
 
+def pergunta_chroma():
+    try:
+        menor = simpledialog.askinteger("Valor","Insira o menor valor")
+        maior = simpledialog.askinteger("Valor","Insira o maior valor")
+
+        if maior < menor or menor < 0 or maior < 0 or maior > 255 or menor > 255:
+            messagebox.showinfo("Alerta","Valor informado deve estar entre 0 e 255")
+            return None
+        return menor,maior
+    except:
+        messagebox.showinfo("Alerta","Valor informado é inválido")
+        return None
+    
 def aplicar_chroma(tela,Path_img,colorido):
     if Path_img:
-        if colorido:
-            valor = pergunta_limiar()   
-            imgfundo = filedialog.askopenfilename(title="Selecione uma Imagem para background", filetypes=[("Imagens", "*.jpg *.png *.jpeg *.tif *.tiff *.bmp")])
-            chroma.chromakey(Path_img, imgfundo, valor,caminho_modificado)
-            Application.display_image(tela,caminho_modificado)
-        else:
-            messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")   
+        try:
+            if colorido:
+                menor,maior = pergunta_chroma()   
+                imgfundo = filedialog.askopenfilename(title="Selecione uma Imagem para background", filetypes=[("Imagens", "*.jpg *.png *.jpeg *.tif *.tiff *.bmp")])
+                chroma.chromakey(Path_img, imgfundo,menor,maior,caminho_modificado)
+                Application.display_image(tela,caminho_modificado)
+            else:
+                messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")   
+        except:
+            messagebox.showinfo("Alerta","Erro")
     else:
         messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
 
