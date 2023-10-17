@@ -22,13 +22,13 @@ def mapeamento(img, matrix, width, height):
                 y = u*matrix[1,0]+v*matrix[1,1]+matrix[1,2]
                 intx, inty = int(x), int(y)
                 if 0 < intx < w and 0 < inty < h:
-                    pix = img[inty, intx]
-                    mapa[v, u] = pix
+                    mapa [v,u] = img.getpixel((intx, inty))
         return mapa
 
 def rotacao(img,valor,salvar):
     angulo = valor
     img = Image.open(img)
+    img = img.convert("RGB")
     w = img.width
     h = img.height
     cx, cy = (w / 2, h / 2)
