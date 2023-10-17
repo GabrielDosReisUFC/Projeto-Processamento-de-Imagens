@@ -163,6 +163,9 @@ class Application:
     def normal(self,path):
         if self.Path_img:
             self.display_image(path)
+            imagem = Image.open(caminho_modificado)
+            imagem.save(caminho_modificado)
+            imagem.close()
         else:
             messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
 
@@ -181,8 +184,9 @@ class Application:
     def salvar_imagem(self):
         if self.Path_img_normal:
             file_path = filedialog.asksaveasfilename(defaultextension=".png",filetypes=[("Imagens", "*.jpg *.png *.jpeg *.tif *.tiff *.bmp")])
-            imagem = Image.open("modificado.tif")
+            imagem = Image.open(caminho_modificado)
             imagem.save(file_path)
+            imagem.close()
         else:
             messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
 

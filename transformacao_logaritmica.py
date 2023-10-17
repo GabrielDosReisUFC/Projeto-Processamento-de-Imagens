@@ -13,8 +13,9 @@ def transformacao_logaritmica(path,salvar):
 def transformacao_logaritmica_simples(path,salvar):
     img = Image.open(path)
     data = np.array(img)
+    ep = 1e-10
     c = 255 / numpy.log(1 + numpy.max(numpy.max(data)))
-    nova_imagem = (c * numpy.log(1+data)).astype(np.uint8)
+    nova_imagem = (c * numpy.log(1+data+ep)).astype(np.uint8)
     img2 = Image.fromarray(nova_imagem)
     img.close()
     img2.save(salvar)

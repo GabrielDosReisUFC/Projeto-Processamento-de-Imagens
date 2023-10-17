@@ -18,10 +18,10 @@ def histograma(file_path):
     dados_imagem = np.array(imagem_original)
 
     contagem_pixel = contagem_de_pixels(imagem_original.height, imagem_original.width, dados_imagem) 
-
+    imagem_original.close()
     plt.plot(range(0,256),contagem_pixel)
     plt.show()
-    imagem_original.close()
+    
 
 def histograma_equalizado(file_path,salvar):
     
