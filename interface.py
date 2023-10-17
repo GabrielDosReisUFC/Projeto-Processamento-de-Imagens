@@ -482,13 +482,15 @@ def escolha_ajutes(tela,Path_img,janela,opcao):
         try:
             resposta = simpledialog.askinteger("Valor","Insira um valor de -100 a 100")
             ajustes.ajuste_saturacao(Path_img,resposta,caminho_modificado)
-        except:
+        except Exception as e:
+            print(e)
             messagebox.showinfo("Alerta","Você deve inserir um valor válido")
     elif opcao == 3:
         try:
             resposta = simpledialog.askinteger("Valor","Insira um valor de -100 a 100")
             ajustes.ajuste_brilho(Path_img,resposta,caminho_modificado)
-        except:
+        except Exception as e:
+            print(e)
             messagebox.showinfo("Alerta","Você deve inserir um valor válido")
     elif opcao == 4:
         try:

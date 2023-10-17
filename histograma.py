@@ -118,7 +118,7 @@ def equalizar_intensidade(img,salvar):
 
     imagem_equalizada = imagem.copy()
     imagem_equalizada = Image.fromarray(np.array(imagem_equalizada), "HSV")
-    imagem_equalizada = conversao.HSV_RGB(imagem_equalizada)
+    imagem_equalizada = conversao.converter_HSV_RGB(imagem_equalizada)
     imagem_equalizada = np.array(imagem_equalizada)
     imagem_equalizada[:,:,2] = intensidade_normalizada * 255 / 100
 
