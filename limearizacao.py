@@ -12,7 +12,6 @@ def limearizar(image_path,valor,salvar):
         limearizar_simples(image_path,valor,salvar)
 
 def limearizar_RGB(image_path,valor,salvar):
-    print(1)
     image = Image.open(image_path)
     imagem_array = np.array(image)
     canal_r =  imagem_array[:,:,0]

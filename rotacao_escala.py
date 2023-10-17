@@ -58,6 +58,7 @@ def interpolacao_nn(img, escala, salvar):
             img_nova.putpixel((j, i), img.getpixel((y, x)))
     img_nova.save(salvar)
     img_nova.close()
+    img.close()
 
 # Função para realizar a interpolação linear
 def interpolacao_lin(img, escala, salvar):
@@ -85,3 +86,4 @@ def interpolacao_lin(img, escala, salvar):
             img_nova.putpixel((j, i), pixel)
     img_nova.save(salvar)
     img_nova.close()
+    img.close()
