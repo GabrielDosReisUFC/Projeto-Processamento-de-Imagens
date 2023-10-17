@@ -40,7 +40,9 @@ def rotacao(img,valor,salvar):
     mat[0,2] += cx - (nova_w / 2)
     mat[1,2] += cy - (nova_h / 2)
     img_nova = mapeamento(img, mat, nova_w, nova_h)
-    img_nova.save(salvar)
+    img = Image.fromarray(img_nova)
+    img.save(salvar)
+    img.close()
 
 #interpolaçao pelo vizinho mais próximo
 def interpolacao_nn(img, escala, salvar):
@@ -55,6 +57,7 @@ def interpolacao_nn(img, escala, salvar):
             y = int(j / escala)
             img_nova.putpixel((j, i), img.getpixel((y, x)))
     img_nova.save(salvar)
+    img_nova.close()
 
 # Função para realizar a interpolação linear
 def interpolacao_lin(img, escala, salvar):
@@ -81,3 +84,4 @@ def interpolacao_lin(img, escala, salvar):
             )
             img_nova.putpixel((j, i), pixel)
     img_nova.save(salvar)
+    img_nova.close()

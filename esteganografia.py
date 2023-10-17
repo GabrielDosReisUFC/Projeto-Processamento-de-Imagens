@@ -55,5 +55,6 @@ def extract_and_display_message(image_path):
     for i in message:
         if i.isprintable():
             text += i
+    img.close()
     return text
     

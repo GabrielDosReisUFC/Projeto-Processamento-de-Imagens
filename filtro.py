@@ -106,7 +106,10 @@ def high_boost(imagem,salvar):
     img.close()
 
 def sobel_x(img):
-    image = Image.open(img)
+    try:
+        image = Image.open(img)
+    except:
+        image = img
     kernel = np.array([[-1, 0, 1], [-2, 0, 2,], [-1, 0, 1]])
     width, height = image.size
     kernel_width, kernel_height = kernel.shape
@@ -125,7 +128,10 @@ def sobel_x(img):
     return nova_imga
 
 def sobel_y(img):
-    image = Image.open(img)
+    try:
+        image = Image.open(img)
+    except:
+        image = img
     kernel = np.array([[-1, -2, -1], [0, 0, 0,], [1, 2, 1]])
     width, height = image.size
     kernel_width, kernel_height = kernel.shape

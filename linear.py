@@ -81,7 +81,9 @@ def linearizar(image_path,salvar):
                         b = math.floor(b*dicionario[i][0] + dicionario[i][1])
                 
                 nova_imagem.point((coluna,linha),fill=(r,g,b))
-            imagem.save(salvar)
+        imagem.save(salvar)
+        imagem.close()
+        img_aux.close()
     else:
         for x in range(img_aux.width):
             for y in range(img_aux.height):
