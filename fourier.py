@@ -34,6 +34,7 @@ def DFT(img, salvar):
 
     img_nova = np.real(F) / np.sqrt(n * m)
     magnitude_image = Image.fromarray(np.uint8(img_nova))
+    magnitude_image = magnitude_image.convert('L')
     magnitude_image.save(salvar)
     magnitude_image.close()
 
@@ -58,5 +59,6 @@ def FFT(img, salvar):
     fft_result = np.fft.fftshift(np.fft.fft2(img_array))
     magnitude = np.abs(fft_result)  
     magnitude_image = Image.fromarray(np.uint8(magnitude))
+    magnitude_image = magnitude_image.convert('L')
     magnitude_image.save(salvar)
     magnitude_image.close()

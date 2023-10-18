@@ -481,12 +481,14 @@ def escolha_ajustes(tela,Path_img,janela,opcao):
         try:
             resposta = simpledialog.askinteger("Valor","Insira um valor de -360 a 360")
             ajustes.ajuste_matiz(Path_img,resposta,caminho_modificado)
+            Application.display_image(tela,caminho_modificado)
         except:
             messagebox.showinfo("Alerta","Você deve inserir um valor válido")
     elif opcao == 2:
         try:
             resposta = simpledialog.askinteger("Valor","Insira um valor de -100 a 100")
             ajustes.ajuste_saturacao(Path_img,resposta,caminho_modificado)
+            Application.display_image(tela,caminho_modificado)
         except Exception as e:
             print(e)
             messagebox.showinfo("Alerta","Você deve inserir um valor válido")
@@ -494,6 +496,7 @@ def escolha_ajustes(tela,Path_img,janela,opcao):
         try:
             resposta = simpledialog.askinteger("Valor","Insira um valor de -100 a 100")
             ajustes.ajuste_brilho(Path_img,resposta,caminho_modificado)
+            Application.display_image(tela,caminho_modificado)
         except Exception as e:
             print(e)
             messagebox.showinfo("Alerta","Você deve inserir um valor válido")
@@ -501,18 +504,21 @@ def escolha_ajustes(tela,Path_img,janela,opcao):
         try:
             resposta = simpledialog.askinteger("Valor","Insira um valor de -255 a 255")
             ajustes.ajuste_R(Path_img,resposta,caminho_modificado)
+            Application.display_image(tela,caminho_modificado)
         except:
             messagebox.showinfo("Alerta","Você deve inserir um valor válido")
     elif opcao == 5:
         try:
             resposta = simpledialog.askinteger("Valor","Insira um valor de -255 a 255")
             ajustes.ajuste_G(Path_img,resposta,caminho_modificado)
+            Application.display_image(tela,caminho_modificado)
         except:
             messagebox.showinfo("Alerta","Você deve inserir um valor válido")
     elif opcao == 6:
         try:
             resposta = simpledialog.askinteger("Valor","Insira um valor de -255 a 255")
             ajustes.ajuste_B(Path_img,resposta,caminho_modificado)
+            Application.display_image(tela,caminho_modificado)
         except:
             messagebox.showinfo("Alerta","Você deve inserir um valor válido")
     Application.display_image(tela,caminho_modificado)
@@ -522,6 +528,7 @@ def aplicar_ajustes(tela,Path_img,colorido):
     if Path_img:
         if colorido:
             janela = Toplevel()
+            janela.attributes('-topmost',True)
             janela .title("Selecione uma opção")
             opcao = StringVar(value="1")
             opcao1 = Radiobutton(janela, text="ajuste matiz", variable=opcao, value="1")
@@ -548,11 +555,8 @@ def aplicar_ajustes(tela,Path_img,colorido):
 
 def pergunta_chroma():
     try:
-        menor = simpledialog.askfloat("Valor","Insira o menor valor")
-        menor.attributes('-topmost',True)
-        maior = simpledialog.askfloat("Valor","Insira o maior valor")
-        maior.attributes('-topmost',True)
-
+        menor = simpledialog.askinteger("Valor","Insira o menor valor")
+        maior = simpledialog.askinteger("Valor","Insira o maior valor")
         if maior < menor or menor < 0 or maior < 0 or maior > 255 or menor > 255:
             messagebox.showinfo("Alerta","Valor informado deve estar entre 0 e 255")
             return None
@@ -570,7 +574,7 @@ def aplicar_chroma(tela,Path_img,colorido):
                 chroma.chromakey(Path_img, imgfundo,menor,maior,caminho_modificado)
                 Application.display_image(tela,caminho_modificado)
             else:
-                messagebox.showinfo("Alerta","formato invalido")   
+                messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")   
         except:
             messagebox.showinfo("Alerta","Erro")
     else:
@@ -621,16 +625,16 @@ def aplicar_rotacao(tela,Path_img):
 
 def escolha_escala(tela,Path_img,janela,opcao):
     janela.destroy()
-    resposta = simpledialog.askfloat("Valor","Insira um valor de escala")
-     
     if opcao == 1:
         try:
+            resposta = simpledialog.askfloat("Valor","Insira um valor de escala")
             rotacao_escala.interpolacao_nn(Path_img,resposta,caminho_modificado)
             Application.display_image(tela,caminho_modificado)
         except:
             messagebox.showinfo("Alerta","Você deve inserir um valor válido")
     elif opcao == 2:
         try:
+            resposta = simpledialog.askfloat("Valor","Insira um valor de escala")
             rotacao_escala.interpolacao_lin(Path_img,resposta,caminho_modificado)
             Application.display_image(tela,caminho_modificado)
         except:

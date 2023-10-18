@@ -24,4 +24,3 @@ def chromakey(path,path2,valor1,valor2,salvar):
     img_final.close()
     
 
-

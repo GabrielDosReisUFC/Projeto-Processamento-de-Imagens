@@ -27,8 +27,8 @@ def mapeamento(img, matrix, width, height):
 
 def rotacao_nn(img,valor,salvar):
     angulo = valor
-    img = Image.open(img)
-    img = img.convert("RGB")
+    imagem = Image.open(img)
+    img = imagem.convert("RGB")
     w = img.width
     h = img.height
     cx, cy = (w / 2, h / 2)
@@ -41,12 +41,14 @@ def rotacao_nn(img,valor,salvar):
     mat[1,2] += cy - (nova_h / 2)
     img_nova = mapeamento(img, mat, nova_w, nova_h)
     img = Image.fromarray(img_nova)
+    if imagem.mode == 'L':
+        img_nova = img_nova.convert('L')
     img.save(salvar)
     img.close()
 
 def rotacao_linear(img_path, angle, salvar):
-    img = Image.open(img_path)
-    img = img.convert("RGB")
+    imagem = Image.open(img_path)
+    img = imagem.convert("RGB")
     w, h = img.size
     cx, cy = (w / 2, h / 2)
     mat = MatR(cx, cy, angle, 1)
@@ -74,6 +76,8 @@ def rotacao_linear(img_path, angle, salvar):
                     int((1 - dx) * (1 - dy) * pixel00[2] + dx * (1 - dy) * pixel10[2] + (1 - dx) * dy * pixel01[2] + dx * dy * pixel11[2])
                 )
                 img_nova.putpixel((u, v), pixel)
+    if imagem.mode == 'L':
+        img_nova = img_nova.convert('L')
     img_nova.save(salvar)
     img_nova.close()
 
@@ -89,6 +93,8 @@ def interpolacao_nn(img, escala, salvar):
             x = int(i / escala)
             y = int(j / escala)
             img_nova.putpixel((j, i), img.getpixel((y, x)))
+    if img.mode == 'L':
+        img_nova = img_nova.convert('L')
     img_nova.save(salvar)
     img_nova.close()
     img.close()
@@ -117,6 +123,8 @@ def interpolacao_lin(img, escala, salvar):
                 int((1 - dx) * (1 - dy) * img.getpixel((y0, x0))[2] + dx * (1 - dy) * img.getpixel((y0, x1))[2] + (1 - dx) * dy * img.getpixel((y1, x0))[2] + dx * dy * img.getpixel((y1, x1))[2])
             )
             img_nova.putpixel((j, i), pixel)
+    if img.mode == 'L':
+        img_nova = img_nova.convert('L')
     img_nova.save(salvar)
     img_nova.close()
     img.close()
