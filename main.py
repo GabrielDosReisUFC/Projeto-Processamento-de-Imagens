@@ -651,10 +651,33 @@ def aplicar_escala(tela,Path_img):
     else:
         messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
 
-def aplicar_fourier(tela,Path_img):
-    if Path_img:
+def escolha_fourier(tela,Path_img,janela,opcao):
+    janela.destroy()
+    if opcao == 1:
+        try:
             fourier.FFT(Path_img,caminho_modificado)
             Application.display_image(tela,caminho_modificado)
+        except:
+            messagebox.showinfo("Alerta","Você deve inserir um valor válido")
+    elif opcao == 2:
+        try:
+            fourier.DFT(Path_img,caminho_modificado)
+            Application.display_image(tela,caminho_modificado)
+        except:
+            messagebox.showinfo("Alerta","Você deve inserir um valor válido")
+
+def aplicar_fourier(tela,Path_img):
+    if Path_img:
+        janela = Toplevel()
+        janela.attributes('-topmost',True)
+        janela .title("Selecione uma opção")
+        opcao = StringVar(value="1")
+        opcao1 = Radiobutton(janela, text="Rápida", variable=opcao, value="1")
+        opcao2 = Radiobutton(janela, text="Ingênua", variable=opcao, value="2")
+        opcao1.pack()
+        opcao2.pack()
+        botao = Button(janela, text="Selecionar", command=lambda:escolha_fourier(tela,Path_img,janela,int(opcao.get())))
+        botao.pack()
     else:
         messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
     

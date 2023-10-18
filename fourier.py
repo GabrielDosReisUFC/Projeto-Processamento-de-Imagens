@@ -1,11 +1,10 @@
 import numpy as np
 from cmath import exp, pi
 import matplotlib.pyplot as plt
-import conversao
 from PIL import Image
 
 #Transformada discreta ingênua de Fourier
-def DFT2D(img, salvar):
+'''def DFT2D(img, salvar):
     imagem = plt.imread(img)
     f = np.array(imagem)
     F = np.zeros(f.shape, dtype=np.complex64)
@@ -17,7 +16,26 @@ def DFT2D(img, salvar):
             for y in np.arange(m):
                 F[u,v] += np.sum(f[:,y] * np.exp( (-1j*2*np.pi) * (((u*x)/n)+((v*y)/m)) ))
     img_nova = F/np.sqrt(n*m)
-    img_nova.save(salvar)
+    img_nova.save(salvar)'''
+
+def DFT(img, salvar):
+    img = Image.open(img)
+    if img.mode == 'RGB':
+        img = img.convert('L')  
+    img_array = np.array(img)
+    n, m = img_array.shape
+    F = np.zeros((n, m), dtype=np.complex64)
+    x = np.arange(n)
+
+    for u in range(n):
+        for v in range(m):
+            for y in range(m):
+                F[u, v] += np.sum(img_array[:, y] * np.exp((-1j * 2 * np.pi) * (((u * x) / n) + ((v * y) / m))))
+
+    img_nova = np.real(F) / np.sqrt(n * m)
+    magnitude_image = Image.fromarray(np.uint8(img_nova))
+    magnitude_image.save(salvar)
+    magnitude_image.close()
 
 #Inversa
 def IDFT2D(F):
