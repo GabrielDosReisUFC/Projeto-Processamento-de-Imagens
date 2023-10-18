@@ -1,7 +1,8 @@
 import numpy as np
 from cmath import exp, pi
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.pyplot as plt
+import conversao
+from PIL import Image
 
 #Transformada discreta ingênua de Fourier
 def DFT2D(img, salvar):
@@ -27,20 +28,17 @@ def IDFT2D(F):
         for y in np.arange(m):
             for v in np.arange(m):
                 f[x,y] += np.real(np.sum(F[:,v] * np.exp( (1j*2*np.pi) * (((u*x)/n)+((v*y)/m)) )))
-    return np.real(f/np.sqrt(n*m))
+    np.real(f/np.sqrt(n*m))
+    return
 
 #Rápida - recursiva divisão e conquista
 def FFT(img, salvar):
-    imagem = plt.imread(img)
-    f = np.array(imagem)
-    N = len(f)
-    if N <= 1:
-        return f
-    par = FFT(f[0::2])
-    impar = FFT(f[1::2])
-    aux = np.zeros(N).astype(np.complex64)
-    for u in range(N//2):
-        aux[u] = par[u] + exp(-2j*pi*u/N) * impar[u] 
-        aux[u+N//2] = par[u] - exp(-2j*pi*u/N)*impar[u]              
-    aux.save(salvar)
-
+    img = Image.open(img)
+    if img.mode == 'RGB':
+        img = img.convert('L')
+    img_array = np.array(img)
+    fft_result = np.fft.fftshift(np.fft.fft2(img_array))
+    magnitude = np.abs(fft_result)  
+    magnitude_image = Image.fromarray(np.uint8(magnitude))
+    magnitude_image.save(salvar)
+    magnitude_image.close()

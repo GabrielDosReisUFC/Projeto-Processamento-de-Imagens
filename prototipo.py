@@ -1,97 +1,77 @@
 import numpy as np
-import cv2
-import tkinter as tk
-from tkinter import filedialog
+import matplotlib.pyplot as plt
+from skimage.io import imread, imshow
+from skimage.color import rgb2hsv, rgb2gray, rgb2yuv
+from skimage import color, exposure, transform
+from skimage.exposure import equalize_hist
 
-# Variáveis globais
-current_brush_color = 0
-drawing = False
-spectrum = None
-spectrum_view = None
-spectrum_rect = None
-prev_x, prev_y = 0, 0
-image = None
-height, width = 0, 0
+dark_image = imread('\testes\cameraman.png')
 
-def calculate_dft(image):
-    f_transform = np.fft.fft2(image)
-    f_shift = np.fft.fftshift(f_transform)
-    return f_shift
+dark_image_grey = rgb2gray(dark_image)
+plt.figure(num=None, figsize=(8, 6), dpi=80)
+plt.imshow(dark_image_grey, cmap='gray');
 
-def calculate_inverse_dft(f_shift):
-    f_ishift = np.fft.ifftshift(f_shift)
-    image_back = np.fft.ifft2(f_ishift)
-    return np.abs(image_back)
+dark_image_grey_fourier = np.fft.fftshift(np.fft.fft2(dark_image_grey))
+plt.figure(num=None, figsize=(8, 6), dpi=80)
+plt.imshow(np.log(abs(dark_image_grey_fourier)), cmap='gray');
 
-def toggle_brush_color():
-    current_brush_color = 255 - current_brush_color
+def fourier_masker_ver(image, i):
+    f_size = 15
+    dark_image_grey_fourier =
+    np.fft.fftshift(np.fft.fft2(rgb2gray(image)))    dark_image_grey_fourier[:225, 235:240] = i
+    dark_image_grey_fourier[-225:,235:240] = i    fig, ax = plt.subplots(1,3,figsize=(15,15))
+    ax[0].imshow(np.log(abs(dark_image_grey_fourier)), cmap='gray')
+    ax[0].set_title('Masked Fourier', fontsize = f_size)
+    ax[1].imshow(rgb2gray(image), cmap = 'gray')
+    ax[1].set_title('Greyscale Image', fontsize = f_size);
+    ax[2].imshow(abs(np.fft.ifft2(dark_image_grey_fourier)), 
+                     cmap='gray')
+    ax[2].set_title('Transformed Greyscale Image', 
+                     fontsize = f_size);
+    
+fourier_masker(dark_image, 1)
 
-def draw_spectrum(event):
-    x, y = event.x, event.y
-    i, j = y, x
+def fourier_masker_hor(image, i):
+    f_size = 15
+    dark_image_grey_fourier =
+    np.fft.fftshift(np.fft.fft2(rgb2gray(image)))    dark_image_grey_fourier[235:240, :230] = i
+    dark_image_grey_fourier[235:240,-230:] = i    fig, ax = plt.subplots(1,3,figsize=(15,15))
+    ax[0].imshow(np.log(abs(dark_image_grey_fourier)), cmap='gray')
+    ax[0].set_title('Masked Fourier', fontsize = f_size)
+    ax[1].imshow(rgb2gray(image), cmap = 'gray')
+    ax[1].set_title('Greyscale Image', fontsize = f_size);
+    ax[2].imshow(abs(np.fft.ifft2(dark_image_grey_fourier)), 
+                     cmap='gray')
+    ax[2].set_title('Transformed Greyscale Image', 
+                     fontsize = f_size);
+fourier_masker_hor(dark_image, 1)
 
-    if event.type == 'ButtonPress':
-        drawing = True
-        prev_x, prev_y = x, y
+def fourier_iterator(image, value_list):
+    for i in value_list:
+        fourier_masker_ver(image, i)
+ 
+fourier_iterator(dark_image, [0.001, 1, 100])
 
-    if drawing and 0 <= i < height and 0 <= j < width:
-        if event.type == 'Motion':
-            color = current_brush_color
-            spectrum[i, j] = color
-            spectrum_view.itemconfig(spectrum_rect, fill='#%02x%02x%02x' % (color, color, color))
-
-    if event.type == 'ButtonRelease':
-        drawing = False
-
-def update_image():
-    global spectrum
-    f_shift = np.zeros((height, width), dtype=complex)
-    for i in range(height):
-        for j in range(width):
-            f_shift[i, j] = spectrum[i, j]
-
-    image_back = calculate_inverse_dft(f_shift)
-    image_back = cv2.normalize(image_back, None, 0, 255, cv2.NORM_MINMAX)
-    image_back = np.uint8(image_back)
-
-    cv2.imshow("Filtered Image", image_back)
-
-root = tk.Tk()
-root.title("DFT Image Editor")
-
-file_path = filedialog.askopenfilename()
-if not file_path:
-    root.destroy()
-    exit()
-
-image = cv2.imread(file_path, cv2.IMREAD_GRAYSCALE)
-
-height, width = image.shape
-spectrum = np.zeros((height, width), dtype=np.uint8)
-
-cv2.imshow("Original Image", image)
-
-f_shift = calculate_dft(image)
-
-spectrum_view = tk.Canvas(root, width=width, height=height)
-spectrum_view.pack()
-spectrum_rect = spectrum_view.create_rectangle(0, 0, width, height, fill="white")
-spectrum_view.bind('<ButtonPress-1>', draw_spectrum)
-spectrum_view.bind('<ButtonRelease-1>', draw_spectrum)
-spectrum_view.bind('<B1-Motion>', draw_spectrum)
-spectrum_view.bind('<ButtonPress-3>', draw_spectrum)
-spectrum_view.bind('<ButtonRelease-3>', draw_spectrum)
-spectrum_view.bind('<B3-Motion>', draw_spectrum)
-
-# Botão para alternar entre pincel preto e branco
-brush_color_button = tk.Button(root, text="Alternar Pincel", command=toggle_brush_color)
-brush_color_button.pack()
-
-# Botão para calcular a transformada inversa
-inverse_button = tk.Button(root, text="Calcular Inversa", command=update_image)
-inverse_button.pack()
-
-root.mainloop()
-
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+def fourier_transform_rgb(image):
+    f_size = 25
+    transformed_channels = []
+    for i in range(3):
+        rgb_fft = np.fft.fftshift(np.fft.fft2((image[:, :, i])))
+        rgb_fft[:225, 235:237] = 1
+        rgb_fft[-225:,235:237] = 1
+        transformed_channels.append(abs(np.fft.ifft2(rgb_fft)))
+    
+    final_image = np.dstack([transformed_channels[0].astype(int), 
+                             transformed_channels[1].astype(int), 
+                             transformed_channels[2].astype(int)])
+    
+    fig, ax = plt.subplots(1, 2, figsize=(17,12))
+    ax[0].imshow(image)
+    ax[0].set_title('Original Image', fontsize = f_size)
+    ax[0].set_axis_off()
+    
+    ax[1].imshow(final_image)
+    ax[1].set_title('Transformed Image', fontsize = f_size)
+    ax[1].set_axis_off()
+    
+    fig.tight_layout()

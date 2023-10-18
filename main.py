@@ -81,10 +81,10 @@ class Application:
         self.bt11 = Button(self.frame3, width=30, height=1, compound="c", text="Ajustes", command=lambda:aplicar_ajustes(self,self.Path_img,self.colorido))
         self.bt11.grid(row=12,column=0,ipadx = 5, ipady= 5 )
 
-        self.bt12 = Button(self.frame3, width=30, height=1, compound="c", text="Sepia", command=lambda:aplicar_sepia(self,self.Path_img,self.colorido))
+        self.bt12 = Button(self.frame3, width=30, height=1, compound="c", text="Sépia", command=lambda:aplicar_sepia(self,self.Path_img,self.colorido))
         self.bt12.grid(row=13,column=0,ipadx = 5, ipady= 5 )
 
-        self.bt13 = Button(self.frame3, width=30, height=1, compound="c", text="Chroma key", command=lambda:aplicar_chroma(self,self.Path_img,self.colorido))
+        self.bt13 = Button(self.frame3, width=30, height=1, compound="c", text="Chroma Key", command=lambda:aplicar_chroma(self,self.Path_img,self.colorido))
         self.bt13.grid(row=14,column=0,ipadx = 5, ipady= 5 )
 
         self.bt14 = Button(self.frame3, width=30, height=1, compound="c", text="Rotação", command=lambda:aplicar_rotacao(self,self.Path_img))
@@ -254,7 +254,7 @@ def aplicar_histograma(tela,Path_img,colorido):
     if Path_img:
         janela = Toplevel()
         janela.title("Selecione uma opção")
-        opcao = StringVar()
+        opcao = StringVar(value="1")
         opcao1 = Radiobutton(janela, text="Histograma", variable=opcao, value="1")
         opcao2 = Radiobutton(janela, text="Equalizar por histograma", variable=opcao, value="2")
 
@@ -307,7 +307,7 @@ def aplicar_Esteganografia(Path_img,colorido,text):
     if Path_img:
         janela = Toplevel()
         janela .title("Selecione uma opção")
-        opcao = StringVar()
+        opcao = StringVar(value="1")
         opcao1 = Radiobutton(janela, text="Ler", variable=opcao, value="1")
         opcao2 = Radiobutton(janela, text="Escrever", variable=opcao, value="2")
 
@@ -414,7 +414,7 @@ def aplicar_filtros(tela,Path_img,colorido):
                 
     top_level = Toplevel()
     top_level .title("Selecione uma opção")
-    opcao = StringVar()
+    opcao = StringVar(value="1")
 
     op_1 = ttk.Radiobutton(top_level, text="Filtro Genérico", variable=opcao, value="Generico")
     op_2 = ttk.Radiobutton(top_level, text="Filtro de suavização média simples", variable=opcao, value="simples")
@@ -462,7 +462,7 @@ def aplicar_converter_escala_cinza(tela,Path_img,colorido):
         else:
             janela = Toplevel()
             janela .title("Selecione uma opção")
-            opcao = StringVar()
+            opcao = StringVar(value="1")
             opcao1 = Radiobutton(janela, text="simples", variable=opcao, value="1")
             opcao2 = Radiobutton(janela, text="ponderado", variable=opcao, value="2")
 
@@ -523,7 +523,7 @@ def aplicar_ajustes(tela,Path_img,colorido):
         if colorido:
             janela = Toplevel()
             janela .title("Selecione uma opção")
-            opcao = StringVar()
+            opcao = StringVar(value="1")
             opcao1 = Radiobutton(janela, text="ajuste matiz", variable=opcao, value="1")
             opcao2 = Radiobutton(janela, text="ajuste saturação", variable=opcao, value="2")
             opcao3 = Radiobutton(janela, text="ajuste brilho", variable=opcao, value="3")
@@ -539,7 +539,7 @@ def aplicar_ajustes(tela,Path_img,colorido):
             opcao6.pack()
 
             # Botão de submissão
-            botao = Button(janela, text="Selecionar", command=lambda:escolha_ajutes(tela,Path_img,janela,int(opcao.get())))
+            botao = Button(janela, text="Selecionar", command=lambda:escolha_ajustes(tela,Path_img,janela,int(opcao.get())))
             botao.pack()
         else:
             messagebox.showinfo("Alerta","Formato de imagem inválido")
@@ -549,7 +549,9 @@ def aplicar_ajustes(tela,Path_img,colorido):
 def pergunta_chroma():
     try:
         menor = simpledialog.askfloat("Valor","Insira o menor valor")
+        menor.attributes('-topmost',True)
         maior = simpledialog.askfloat("Valor","Insira o maior valor")
+        maior.attributes('-topmost',True)
 
         if maior < menor or menor < 0 or maior < 0 or maior > 255 or menor > 255:
             messagebox.showinfo("Alerta","Valor informado deve estar entre 0 e 255")
@@ -586,48 +588,49 @@ def aplicar_sepia(tela,Path_img,colorido):
 
 def escolha_rotacao(tela,Path_img,janela,opcao):
     janela.destroy()
+    resposta = simpledialog.askfloat("Valor","Insira o ângulo")
+     
     if opcao == 1:
-        # try:
-        resposta = simpledialog.askfloat("Valor","Insira o ângulo")
-        rotacao_escala.rotacao_nn(Path_img,resposta,caminho_modificado)
-        # except:
-            # messagebox.showinfo("Alerta","Você deve inserir um valor válido")
+        try:
+            rotacao_escala.rotacao_nn(Path_img,resposta,caminho_modificado)
+            Application.display_image(tela,caminho_modificado)
+        except:
+            messagebox.showinfo("Alerta","Você deve inserir um valor válido")
     elif opcao == 2:
         try:
-            resposta = simpledialog.askfloat("Valor","Insira o ângulo")
             rotacao_escala.rotacao_linear(Path_img,resposta,caminho_modificado)
+            Application.display_image(tela,caminho_modificado)
         except:
             messagebox.showinfo("Alerta","Você deve inserir um valor válido")
 
 def aplicar_rotacao(tela,Path_img):
     if Path_img:
         janela = Toplevel()
+        janela.attributes('-topmost',True)
         janela .title("Selecione uma opção")
-        opcao = StringVar()
+        opcao = StringVar(value="1")
         opcao1 = Radiobutton(janela, text="Vizinho mais próximo", variable=opcao, value="1")
         opcao2 = Radiobutton(janela, text="Linear", variable=opcao, value="2")
         opcao1.pack()
         opcao2.pack()
-        botao = Button(janela, text="Selecionar", command=lambda:escolha_escala(tela,Path_img,janela,int(opcao.get())))
+        botao = Button(janela, text="Selecionar", command=lambda:escolha_rotacao(tela,Path_img,janela,int(opcao.get())))
         botao.pack()
         Application.display_image(tela,caminho_modificado)
     else:
         messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
 
-#Aplicar escala: menu para escolher linear ou nearest neighbour
-
 def escolha_escala(tela,Path_img,janela,opcao):
     janela.destroy()
+    resposta = simpledialog.askfloat("Valor","Insira um valor de escala")
+     
     if opcao == 1:
         try:
-            resposta = simpledialog.askfloat("Valor","Insira um valor de escala")
             rotacao_escala.interpolacao_nn(Path_img,resposta,caminho_modificado)
             Application.display_image(tela,caminho_modificado)
         except:
             messagebox.showinfo("Alerta","Você deve inserir um valor válido")
     elif opcao == 2:
         try:
-            resposta = simpledialog.askfloat("Valor","Insira um valor de escala")
             rotacao_escala.interpolacao_lin(Path_img,resposta,caminho_modificado)
             Application.display_image(tela,caminho_modificado)
         except:
@@ -636,8 +639,9 @@ def escolha_escala(tela,Path_img,janela,opcao):
 def aplicar_escala(tela,Path_img):
     if Path_img:
         janela = Toplevel()
+        janela.attributes('-topmost',True)
         janela .title("Selecione uma opção")
-        opcao = StringVar()
+        opcao = StringVar(value="1")
         opcao1 = Radiobutton(janela, text="Vizinho mais próximo", variable=opcao, value="1")
         opcao2 = Radiobutton(janela, text="Linear", variable=opcao, value="2")
         opcao1.pack()
@@ -647,59 +651,10 @@ def aplicar_escala(tela,Path_img):
     else:
         messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
 
-def escolher_fourier(Path_img,janela,opcao):
-    janela.destroy()
-    if opcao == 1:
-        fourier.DFT2D(Path_img,caminho_modificado)
-    elif opcao == 2:
-        fourier.FFT(Path_img,caminho_modificado)
-
-#Aplicar Fourier: rápida ou ingênua
 def aplicar_fourier(tela,Path_img):
     if Path_img:
-        janela = Toplevel()
-        janela .title("Selecione uma opção")
-        opcao = StringVar()
-        opcao1 = Radiobutton(janela, text="Transformada discreta", variable=opcao, value="1")
-        opcao2 = Radiobutton(janela, text="Transformada rápida", variable=opcao, value="2")
-        opcao1.pack()
-        opcao2.pack()
-        botao = Button(janela, text="Selecionar", command=lambda:escolher_fourier(Path_img,janela,int(opcao.get())))
-        botao.pack()
-        opcao1 = Radiobutton(janela, text="Transformada discreta", variable=opcao, value="1")
-        opcao2 = Radiobutton(janela, text="Transformada rápida", variable=opcao, value="2")
-        opcao1.pack()
-        opcao2.pack()
-        botao = Button(janela, text="Selecionar", command=lambda:escolher_fourier(Path_img,janela,int(opcao.get())))
-        botao.pack()
-        Application.display_image(tela,caminho_modificado)
-        canvas = FigureCanvasTkAgg(Figure(figsize=(6, 4)), master=tela)
-        canvas.get_tk_widget().pack()
-        fourier.edit_spectrum_with_brush(caminho_modificado, canvas)
-        magnitude_spectrum = np.abs(F)
-        plt.imshow(np.log(1 + magnitude_spectrum), cmap='gray')
-        def edit_spectrum_with_brush(img, canvas):
-            imagem = plt.imread(img)
-            F = np.array(imagem)
-            def edit(event):
-                x, y = int(event.xdata), int(event.ydata)
-                radius = 5  # Tamanho do pincel
-                mask = np.zeros(F.shape)
-                for i in range(x - radius, x + radius + 1):
-                    for j in range(y - radius, y + radius + 1):
-                        if 0 <= i < F.shape[1] and 0 <= j < F.shape[0]:
-                            mask[j, i] = 1  # Define os pontos dentro do raio do pincel como 1
-                            F *= (1 - mask)  # Inverte os pontos clicados de preto para branco
-
-            canvas.figure.clf()
-            magnitude_spectrum = np.abs(F)
-            plt.imshow(np.log(1 + magnitude_spectrum), cmap='gray')
-            plt.title('Espectro')
-            plt.colorbar()
-            plt.show()
-            canvas.draw()
-            modified_F = F  
-            filtered_image = fourier.IDFT2D(modified_F)  
+            fourier.FFT(Path_img,caminho_modificado)
+            Application.display_image(tela,caminho_modificado)
     else:
         messagebox.showinfo("Alerta","Você deve abrir uma imagem primeiro")
     
