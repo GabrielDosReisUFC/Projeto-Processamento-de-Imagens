@@ -22,8 +22,8 @@ def inverse_haar_wavelet_transform(matrix):
 
     return result
 
-def wavelet_compress(image_path, output_path, wavelet_transform, inverse_wavelet_transform, level=1):
-
+# def wavelet_compress(image_path, output_path, wavelet_transform, inverse_wavelet_transform, level=1):
+def compress(image_path, wavelet_transform=haar_wavelet_transform, inverse_wavelet_transform=inverse_haar_wavelet_transform, level=1):
     img = Image.open(image_path)
     img_array = np.array(img, dtype=float)
 
@@ -50,14 +50,14 @@ def wavelet_compress(image_path, output_path, wavelet_transform, inverse_wavelet
 
     img_array = np.clip(img_array, 0, 255).astype(np.uint8)
 
-
     compressed_img = Image.fromarray(img_array)
-    compressed_img.save(output_path)
+    return compressed_img
+    # compressed_img.save(output_path)
 
+if __name__ == '__main__': 
+    input_image_path = 'benchmark.bmp'
+    output_compressed_image_path = 'output_compressed_image.bmp'
 
-input_image_path = 'benchmark.bmp'
-output_compressed_image_path = 'output_compressed_image.bmp'
+    compression_level = 5
 
-compression_level = 5
-
-wavelet_compress(input_image_path, output_compressed_image_path, haar_wavelet_transform, inverse_haar_wavelet_transform, compression_level)
+    # wavelet_compress(input_image_path, output_compressed_image_path, haar_wavelet_transform, inverse_haar_wavelet_transform, compression_level)

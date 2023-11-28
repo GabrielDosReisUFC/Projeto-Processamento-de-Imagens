@@ -2,9 +2,13 @@ from PIL import Image
 import numpy as np
 
 def carregar_imagem(caminho):
-    imagem = Image.open(caminho)
-    array_imagem = np.array(imagem, dtype=np.int16)
-    return array_imagem,imagem.size
+    try:
+        imagem = Image.open(caminho)
+        array_imagem = np.array(imagem, dtype=np.int16)
+        return array_imagem,imagem.size
+    except:
+        array_imagem = np.array(caminho, dtype=np.int16)
+        return array_imagem,caminho.size
 
 def predictive_coding_encode(image,tam):
     x,y = tam
