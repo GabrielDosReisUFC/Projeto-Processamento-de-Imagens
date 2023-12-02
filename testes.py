@@ -1,28 +1,47 @@
+
+import numpy as np
 from PIL import Image
+import os
+import huffman
+import codificacao_preditiva
+import wavelet
 
-# Carregue a imagem original
-imagem_original = Image.open('fundo.jpg')
+def compactar_imagem(caminho, saida):
+    compressed_img = wavelet.compress(caminho)
+    encoded_data = codificacao_preditiva.predictive_coding_encode(compressed_img)
+    huffman.compress_array(encoded_data,saida)
 
-# Define a cor de fundo que você deseja substituir (verde no formato RGB)
-cor_de_fundo_min = 150
-cor_de_fundo_max = 220
-# Carregue a imagem de substituição
-imagem_substituicao = Image.open('praia.jpg')
-imagem_substituicao = imagem_substituicao.resize((imagem_original.width, imagem_original.height))
-# Crie uma máscara para isolar a cor de fundo
-mascara = Image.new('L', imagem_original.size)
-for x in range(imagem_original.width):
-    for y in range(imagem_original.height):
-        pixel = imagem_original.getpixel((x, y))
-        r,g,b = pixel[:3] 
-        # if cor_de_fundo_min < pixel[:3] :
-        if cor_de_fundo_min< g and g < cor_de_fundo_max :
-            mascara.putpixel((x, y), 255)
-        else:
-            mascara.putpixel((x, y), 0)
+def descompactar_imagem(caminho, saida):
+    imagem_codificada =huffman.decompress_image(caminho)
+    codificacao_preditiva.decodificacao_preditiva(imagem_codificada,saida)
 
-# Combinar a imagem original e a imagem de substituição usando a máscara
-imagem_final = Image.composite(imagem_substituicao, imagem_original, mascara)
+def limpar_terminal():
+    if os.name == 'nt':
+        os.system('cls')
+    else:
+        os.system('clear')
 
-# Salvar a imagem resultante
-imagem_final.show()
+if __name__ == "__main__":
+    while True:
+        # try:
+            caminho = str(input("Digite o caminho da imagem: "))
+            escolha = int(input("Você deseja:\n1 - descompactar\n2 - compactar a imagem:\n"))
+
+            if escolha == 1:
+                saida = f'{caminho.split(".")[0]}_saida.bmp'
+                descompactar_imagem(caminho,saida)
+                print(f'Tamanho da imagem comprimida: {os.path.getsize(caminho)}')
+                print(f'Tamanho da imagem descomprimida: {os.path.getsize(saida)}')
+
+            elif escolha == 2:
+                saida = f'{caminho.split(".")[0]}.grr'
+                compactar_imagem(caminho, saida)
+                print(f'Tamanho da imagem original: {os.path.getsize(caminho)}')
+                print(f'Tamanho da imagem comprimida: {os.path.getsize(saida)}')
+            
+        # except (EOFError, KeyboardInterrupt):
+        #     print("\nFim do programa.")
+        #     break
+        # except:
+        #     limpar_terminal()
+        #     print("Ocorreu um erro inesperado") 
