@@ -121,12 +121,10 @@ def compressed_size(counts, codes):
     return (header_size + tree_size + pixels_size) / 8
 
 def compress_array(array, out_file_name):
-    size_raw = array.shape
     counts = count_symbols(array)
     tree = build_tree(counts)
     trimmed_tree = trim_tree(tree)
     codes = assign_codes(trimmed_tree)
-    size_estimate = compressed_size(counts, codes)
     stream = OutputBitStream(out_file_name)
     encode_header(array, stream)
     stream.flush() 

@@ -10,7 +10,8 @@ def carregar_imagem(caminho):
         array_imagem = np.array(caminho, dtype=np.int16)
         return array_imagem,caminho.size
 
-def predictive_coding_encode(image,tam):
+def predictive_coding_encode(caminho):
+    image,tam = carregar_imagem(caminho)
     x,y = tam
     imagem_copia = np.array(image, dtype=np.int16)
     for i in range(y):  
