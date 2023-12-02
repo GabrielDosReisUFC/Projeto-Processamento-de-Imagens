@@ -3,136 +3,145 @@ import numpy as np
 from collections import Counter
 import codificacao_preditiva
 
-def to_binary_list_16(n):
-    return [n] if (n <= 1) else to_binary_list_16(n >> 1) + [n & 1]
-
-def from_binary_list_16(bits):
-    result = 0
-    for bit in bits:
-        result = (result << 1) | bit
-    return result
-
-def pad_bits_16(bits, n):
-    assert(n >= len(bits))
-    return ([0] * (n - len(bits)) + bits)
-
-def count_symbols(image):
+# Ordena a quantidade de ocorrencia da intensidade
+def contar_numeros(image):
     pixels = image.flatten()
     counts = Counter(pixels).items()
     return sorted(counts, key=lambda x: x[::-1])
 
-def build_tree(counts):
-    nodes = [entry[::-1] for entry in counts]
+# Constroe árvore de cima para baixo 
+def construir_arvore(counts):
+    nodes = [entry[::-1] for entry in counts] # Reverter cada tupla (símbolo, contagem)
     while len(nodes) > 1:
-        leastTwo = tuple(nodes[0:2])
-        theRest = nodes[2:]
-        combFreq = leastTwo[0][0] + leastTwo[1][0]
-        nodes = theRest + [(combFreq, leastTwo)]
+        leastTwo = tuple(nodes[0:2])  # Obter os 2 para combinar
+        theRest = nodes[2:] # Todos os outros
+        combFreq = leastTwo[0][0] + leastTwo[1][0] # Frequência do ponto de ramificação
+        nodes = theRest + [(combFreq, leastTwo)] # Adicionar ponto de ramificação ao final
         nodes.sort(key=lambda x: x[0])  # Usando x[0] para ordenar pela frequência
-    return nodes[0]
+    return nodes[0] # Retornar a única árvore dentro da lista
 
-def trim_tree(tree):
+# Função usada para retornar somente os simbolos ordenados por frequencia da arvore
+def podar(tree):
     p = tree[1]
     if type(p) is tuple:
-        return (trim_tree(p[0]), trim_tree(p[1]))
+        return (podar(p[0]), podar(p[1]))
     return p
 
-def assign_codes_impl(codes, node, pat):
-    if type(node) == tuple:
-        assign_codes_impl(codes, node[0], pat + [0])
-        assign_codes_impl(codes, node[1], pat + [1])
+def descer_arvore(codes, node, pat):
+    if type(node) == tuple: # Ponto de ramificação.
+        descer_arvore(codes, node[0], pat + [0]) # Faça o ramo esquerdo.
+        descer_arvore(codes, node[1], pat + [1]) # Em seguida, faça o ramo direito.
     else:
-        codes[node] = pat
+        codes[node] = pat # Uma folha
 
-def assign_codes(tree):
+def criar_dicionario(tree): # Faz a inicialização do dicionário que vai ser usado para acessar os códigos na arvore
     codes = {}
-    assign_codes_impl(codes, tree, [])
+    descer_arvore(codes, tree, [])
     return codes
 
+def binario_lista(n): # Converter um inteiro em na menor lista de bits
+    return [n] if (n <= 1) else binario_lista(n >> 1) + [n & 1]
+
+def lista_binario(bits):
+    result = 0 
+    for bit in bits: # Converter uma lista de bits em um inteiro
+        result = (result << 1) | bit
+    return result
+
+def preencher(bits, n):
+    # Preenche a lista de bits até que ela tenha um total de n digitos
+    assert(n >= len(bits))
+    return ([0] * (n - len(bits)) + bits)
+
 class OutputBitStream(object):
+    # Inicializa um arquivo que será usado para escrever
     def __init__(self, file_name):
         self.file_name = file_name
         self.file = open(self.file_name, 'wb')
         self.bytes_written = 0
         self.buffer = []
 
+    # Usado para escerver um bit no buffer
     def write_bit(self, value):
         self.write_bits([value])
 
+    # Se o buffer for maior que 8, escrevemos os bits no arquivo
     def write_bits(self, values):
         self.buffer += values
         while len(self.buffer) >= 8:
             self._save_byte()
 
     def flush(self):
-        if len(self.buffer) > 0:
+        if len(self.buffer) > 0:  # Adiciona zeros para completar o byte e depois o escreve
             self.buffer += [0] * (8 - len(self.buffer))
             self._save_byte()
         assert(len(self.buffer) == 0)
-
+    
+    # Sava as informações no arquivo
     def _save_byte(self):
         bits = self.buffer[:8]
         self.buffer[:] = self.buffer[8:]
 
-        byte_value = from_binary_list_16(bits)
+        byte_value = lista_binario(bits)
         if 0 <= byte_value <= 255:
             self.file.write(bytes([byte_value]))
             self.bytes_written += 1
         else:
             raise ValueError(f"Invalid byte value: {byte_value}")
 
+    # garante que tudo seja escrito no arquivo antes de fechá-lo
     def close(self):
         self.flush()
         self.file.close()
 
-def encode_header(image, bitstream):
-    height_bits = pad_bits_16(to_binary_list_16(image.shape[0]), 16)
+def codificar_cabecalho(image, bitstream):
+    height_bits = preencher(binario_lista(image.shape[0]), 16)
     bitstream.write_bits(height_bits)
-    width_bits = pad_bits_16(to_binary_list_16(image.shape[1]), 16)
+    width_bits = preencher(binario_lista(image.shape[1]), 16)
     bitstream.write_bits(width_bits)
 
-def encode_tree(tree, bitstream):
+def codificar_arvore(tree, bitstream):
     if type(tree) == tuple:
         bitstream.write_bit(0)
-        encode_tree(tree[0], bitstream)
-        encode_tree(tree[1], bitstream)
+        codificar_arvore(tree[0], bitstream)
+        codificar_arvore(tree[1], bitstream)
     else:
         bitstream.write_bit(1)
-        symbol_bits = pad_bits_16(to_binary_list_16(tree), 16)
+        symbol_bits = preencher(binario_lista(tree), 16)
         bitstream.write_bits(symbol_bits)
 
-def encode_pixels(image, codes, bitstream):
+def codificar_pixels(image, codes, bitstream):
     pixels = image.flatten()
     for value in pixels:
         bitstream.write_bits(codes[value])
 
 def compressed_size(counts, codes):
-    header_size = 2 * 16  # height and width as 16-bit values
+    header_size = 2 * 16 
 
-    tree_size = len(counts) * (1 + 16)  # Leafs: 1 bit flag, 16-bit symbol each
-    tree_size += len(counts) - 1  # Nodes: 1 bit flag each
-    if tree_size % 8 > 0:  # Padding to next full byte
+    tree_size = len(counts) * (1 + 16)  
+    if tree_size % 8 > 0:
         tree_size += 8 - (tree_size % 8)
 
     pixels_size = sum([count * len(codes[symbol]) for symbol, count in counts])
-    if pixels_size % 8 > 0:  # Padding to next full byte
+    if pixels_size % 8 > 0:
         pixels_size += 8 - (pixels_size % 8)
 
     return (header_size + tree_size + pixels_size) / 8
 
 def compress_array(array, out_file_name):
-    counts = count_symbols(array)
-    tree = build_tree(counts)
-    trimmed_tree = trim_tree(tree)
-    codes = assign_codes(trimmed_tree)
+    counts = contar_numeros(array)
+    tree = construir_arvore(counts)
+    trimmed_tree = podar(tree)
+    codes = criar_dicionario(trimmed_tree)
     stream = OutputBitStream(out_file_name)
-    encode_header(array, stream)
+    codificar_cabecalho(array, stream)
     stream.flush() 
-    encode_tree(trimmed_tree, stream)
+    codificar_arvore(trimmed_tree, stream)
     stream.flush()
-    encode_pixels(array, codes, stream)
+    codificar_pixels(array, codes, stream)
     stream.close()
 
+# Ler bits de um arquivo
 class InputBitStream(object):
     def __init__(self, file_name):
         self.file_name = file_name
@@ -156,47 +165,46 @@ class InputBitStream(object):
 
     def _load_byte(self):
         value = ord(self.file.read(1))
-        self.buffer += pad_bits_16(to_binary_list_16(value), 8)
+        self.buffer += preencher(binario_lista(value), 8)
         self.bytes_read += 1
 
     def close(self):
         self.file.close()
 
-
-def decode_header(bitstream):
-    height = from_binary_list_16(bitstream.read_bits(16))
-    width = from_binary_list_16(bitstream.read_bits(16))
+def decodificar_cabecalho(bitstream):
+    height = lista_binario(bitstream.read_bits(16))
+    width = lista_binario(bitstream.read_bits(16))
     return (height, width)
 
-def decode_tree(bitstream):
+def decodificar_arvore(bitstream):
     flag = bitstream.read_bits(1)[0]
     if flag == 1:
-        return np.uint16(from_binary_list_16(bitstream.read_bits(16)))
-    left = decode_tree(bitstream)
-    right = decode_tree(bitstream)
+        return np.uint16(lista_binario(bitstream.read_bits(16)))
+    left = decodificar_arvore(bitstream)
+    right = decodificar_arvore(bitstream)
     return (left, right)
 
-def decode_value(tree, bitstream):
+def decodificar_valor(tree, bitstream):
     bit = bitstream.read_bits(1)[0]
     node = tree[bit]
     if type(node) == tuple:
-        return decode_value(node, bitstream)
+        return decodificar_valor(node, bitstream)
     return np.uint16(node)
 
-def decode_pixels(height, width, tree, bitstream):
+def decodificar_pixels(height, width, tree, bitstream):
     pixels = np.empty((height, width, 3), dtype=np.uint16)
     for i in range(height):
         for j in range(width):
             for channel in range(3):
-                pixels[i, j, channel] = decode_value(tree, bitstream)
+                pixels[i, j, channel] = decodificar_valor(tree, bitstream)
     return pixels
 
 def decompress_image(in_file_name):
     stream = InputBitStream(in_file_name)
-    height, width = decode_header(stream)
+    height, width = decodificar_cabecalho(stream)
     stream.flush()
-    trimmed_tree = decode_tree(stream)
+    trimmed_tree = decodificar_arvore(stream)
     stream.flush()
-    pixels = decode_pixels(height, width, trimmed_tree, stream)
+    pixels = decodificar_pixels(height, width, trimmed_tree, stream)
     stream.close()
     return pixels
