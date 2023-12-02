@@ -75,7 +75,7 @@ class JanelaApp:
             messagebox.showwarning("Aviso", "O campo nome arquivo original está vazio. Abre uma imagem primeiro")
             return False
         elif not self.nome_arquivo_novo.get().strip():
-            messagebox.showwarning("Aviso", "O campo nome arquivo novo está vazio. Abre uma imagem primeiro")
+            messagebox.showwarning("Aviso", "O campo nome arquivo novo está vazio.")
             return False
         return True
         
@@ -85,7 +85,6 @@ class JanelaApp:
             compressed_img = wavelet.compress(self.nome_arquivo.get())
             encoded_data = codificacao_preditiva.predictive_coding_encode(compressed_img)
             huffman.compress_array(encoded_data,self.nome_arquivo_novo.get()+".grl")
-
             self.nome_arquivo_novo.set(os.path.basename(self.nome_arquivo_novo.get()))
             self.tamanho_arquivo_novo.set(f"{os.path.getsize(self.nome_arquivo_novo.get()+'.grl')//1024} kbytes")
 
@@ -94,7 +93,7 @@ class JanelaApp:
         if valido:
             imagem_codificada =huffman.decompress_image(self.nome_arquivo.get())
             codificacao_preditiva.decodificacao_preditiva(imagem_codificada,self.nome_arquivo_novo.get()+".bmp")
-
+            #waveletbenchmark.decompress_image(self.nome_arquivo_novo.get()+".bmp")
             self.nome_arquivo_novo.set(os.path.basename(self.nome_arquivo_novo.get()))
             self.tamanho_arquivo_novo.set(f"{os.path.getsize(self.nome_arquivo_novo.get()+'.bmp')//1024} kbytes")
 

@@ -1,82 +1,116 @@
-import numpy as np
-from PIL import Image
+import pywt
+import numpy
+from PIL import Image, ImageEnhance
 
-def haar_wavelet_transform(matrix):
-    size = len(matrix)
-    result = np.zeros_like(matrix)
-
-    for i in range(size // 2):
-        result[i, :] = (matrix[2 * i, :] + matrix[2 * i + 1, :]) / np.sqrt(2)
-        result[i + size // 2, :] = (matrix[2 * i, :] - matrix[2 * i + 1, :]) / np.sqrt(2)
-
-    return result
-
-def inverse_haar_wavelet_transform(matrix):
-
-    size = len(matrix)
-    result = np.zeros_like(matrix)
-
-    for i in range(size // 2):
-        result[2 * i, :] = (matrix[i, :] + matrix[i + size // 2, :]) / np.sqrt(2)
-        result[2 * i + 1, :] = (matrix[i, :] - matrix[i + size // 2, :]) / np.sqrt(2)
-
-    return result
-
-<<<<<<< HEAD
-def wavelet_compress(image_path, output_path, wavelet_transform, inverse_wavelet_transform, level):
-
-=======
-# def wavelet_compress(image_path, output_path, wavelet_transform, inverse_wavelet_transform, level=1):
-def compress(image_path, wavelet_transform=haar_wavelet_transform, inverse_wavelet_transform=inverse_haar_wavelet_transform, level=1):
->>>>>>> 8d88b07d43b0630b78d75f512609ed5d6a8cce8e
-    img = Image.open(image_path)
-    img_array = np.array(img)
-    red_channel, green_channel, blue_channel = img_array[:, :, 0], img_array[:, :, 1], img_array[:, :, 2]
-    compressed_red = haar_wavelet_transform(red_channel, level)
-    compressed_green = haar_wavelet_transform(green_channel, level)
-    compressed_blue = haar_wavelet_transform(blue_channel, level)
-    compressed_image_array = np.stack([compressed_red, compressed_green, compressed_blue], axis=-1)
-
-    # Convert the array back to a Pillow image
-    compressed_image = Image.fromarray(np.uint8(compressed_image_array))
-    compressed_image.save(output_path)
+def max_ndarray(mat):
+    return numpy.amax(mat) if type(mat).__name__ == 'ndarray' else 0
 
 
-<<<<<<< HEAD
-input_image_path = 'testes\cubo.tif'
-output_compressed_image_path = 'output_compressed_image.bmp'
-=======
-    for i in range(img_array.shape[0]):
-        img_array[i, :] = wavelet_transform(img_array[i, :])
+def get_image_dimensions(imagefile):             # Function to get the dimensions of the image
+    with Image.open(imagefile) as img:
+        width, height = img.size
+    return int(width), int(height)    
+
+def extract_rgb_coeff(img):
+    (width, height) = img.size
+    img = img.copy()
+
+    mat_r = numpy.empty((width, height))
+    mat_g = numpy.empty((width, height))
+    mat_b = numpy.empty((width, height))
+
+    for i in range(width):
+        for j in range(height):
+            (r, g, b) = img.getpixel((i, j))
+            mat_r[i, j] = r
+            mat_g[i, j] = g
+            mat_b[i, j] = b
+
+    coeffs_r = pywt.dwt2(mat_r, 'haar')
+   
+    coeffs_g = pywt.dwt2(mat_g, 'haar')
+    
+    coeffs_b = pywt.dwt2(mat_b, 'haar')
+    
+    return (coeffs_r, coeffs_g, coeffs_b)
 
 
-    for i in range(img_array.shape[1]):
-        img_array[:, i] = wavelet_transform(img_array[:, i])
+def img_from_dwt_coeff(coeff_dwt):
+    # Channel Red
+    (coeffs_r, coeffs_g, coeffs_b) = coeff_dwt
+    cc = numpy.array((coeffs_r, coeffs_g, coeffs_b))
+    (width, height) = (len(coeffs_r[0]), len(coeffs_r[0][0]))
+    cARed = numpy.array(coeffs_r[0])
+    cHRed = numpy.array(coeffs_r[1][0])
+    cVRed = numpy.array(coeffs_r[1][1])
+    cDRed = numpy.array(coeffs_r[1][2])
+    # Channel Green
+    cAGreen = numpy.array(coeffs_g[0])
+    cHGreen = numpy.array(coeffs_g[1][0])
+    cVGreen = numpy.array(coeffs_g[1][1])
+    cDGreen = numpy.array(coeffs_g[1][2])
+    # Channel Blue
+    cABlue = numpy.array(coeffs_b[0])
+    cHBlue = numpy.array(coeffs_b[1][0])
+    cVBlue = numpy.array(coeffs_b[1][1])
+    cDBlue = numpy.array(coeffs_b[1][2])
+
+    # maxValue per channel par matrix
+    cAMaxRed = max_ndarray(cARed)
+    cAMaxGreen = max_ndarray(cAGreen)
+    cAMaxBlue = max_ndarray(cABlue)
+
+    cHMaxRed = max_ndarray(cHRed)
+    cHMaxGreen = max_ndarray(cHGreen)
+    cHMaxBlue = max_ndarray(cHBlue)
+
+    cVMaxRed = max_ndarray(cVRed)
+    cVMaxGreen = max_ndarray(cVGreen)
+    cVMaxBlue = max_ndarray(cVBlue)
+
+    cDMaxRed = max_ndarray(cDRed)
+    cDMaxGreen = max_ndarray(cDGreen)
+    cDMaxBlue = max_ndarray(cDBlue)
+
+    # Image object init
+    dwt_img = Image.new('RGB', (width, height), (0, 0, 20))
+    # cA reconstruction
+
+    '''
+    The image formed from the low frequnecy of the images which contains the main content of the image
+    '''
+    for i in range(width):
+        for j in range(height):
+            R = cARed[i][j]
+            R = (R/cAMaxRed)*100.0
+            G = cAGreen[i][j]
+            G = (G/cAMaxGreen)*100.0
+            B = cABlue[i][j]
+            B = (B/cAMaxBlue)*100.0
+            new_value = (int(R), int(G), int(B))
+            dwt_img.putpixel((i, j), new_value)
+   
+    return dwt_img
 
 
-    for _ in range(level):
-        img_array[:2 ** (level - 1), :2 ** (level - 1)] = 0
+def compress(file):
+    img = Image.open(file)                       # Loads the image selected
+    coef = extract_rgb_coeff(img)              # Extracts the RBG Coefficients from the image 
+    image = img_from_dwt_coeff(coef)           # Forms the new image using the dwt coeeficients                        # Saves the image
 
+    '''
+    Below lines of the code are to resize and enhance the images
+    '''
+    enhancer = ImageEnhance.Brightness(image)
+    image = enhancer.enhance(2)
+   
+    file_enh = "enhanced.bmp"
+    image.save(file_enh)
+    im = Image.open(file_enh)
+    size = get_image_dimensions(file)
+    im_resized = im.resize(size, Image.ANTIALIAS)
+    #im_resized.save(file_comp)
+    
+    return im_resized
 
-    for i in range(img_array.shape[0]):
-        img_array[i, :] = inverse_wavelet_transform(img_array[i, :])
-
-
-    for i in range(img_array.shape[1]):
-        img_array[:, i] = inverse_wavelet_transform(img_array[:, i])
-
-
-    img_array = np.clip(img_array, 0, 255).astype(np.uint8)
-
-    compressed_img = Image.fromarray(img_array)
-    return compressed_img
-    # compressed_img.save(output_path)
-
-if __name__ == '__main__': 
-    input_image_path = 'benchmark.bmp'
-    output_compressed_image_path = 'output_compressed_image.bmp'
-
-    compression_level = 5
->>>>>>> 8d88b07d43b0630b78d75f512609ed5d6a8cce8e
-
-    # wavelet_compress(input_image_path, output_compressed_image_path, haar_wavelet_transform, inverse_haar_wavelet_transform, compression_level)
+compress("benchmark.bmp")

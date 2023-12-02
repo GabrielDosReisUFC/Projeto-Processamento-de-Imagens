@@ -47,7 +47,7 @@ def compress_channel(channel, num_levels):
 
     return compressed_channel.astype(np.uint8)
 
-input_image_path = "testes/cubo.tif"  # Replace with the path to your BMP image
+input_image_path = "benchmark.bmp"  # Replace with the path to your BMP image
 output_image_path = "compressed_image.bmp"  # Change the output filename as needed
 
 compress_image(input_image_path, output_image_path)
