@@ -22,40 +22,22 @@ def inverse_haar_wavelet_transform(matrix):
 
     return result
 
-def wavelet_compress(image_path, output_path, wavelet_transform, inverse_wavelet_transform, level=1):
+def wavelet_compress(image_path, output_path, wavelet_transform, inverse_wavelet_transform, level):
 
     img = Image.open(image_path)
-    img_array = np.array(img, dtype=float)
+    img_array = np.array(img)
+    red_channel, green_channel, blue_channel = img_array[:, :, 0], img_array[:, :, 1], img_array[:, :, 2]
+    compressed_red = haar_wavelet_transform(red_channel, level)
+    compressed_green = haar_wavelet_transform(green_channel, level)
+    compressed_blue = haar_wavelet_transform(blue_channel, level)
+    compressed_image_array = np.stack([compressed_red, compressed_green, compressed_blue], axis=-1)
+
+    # Convert the array back to a Pillow image
+    compressed_image = Image.fromarray(np.uint8(compressed_image_array))
+    compressed_image.save(output_path)
 
 
-    for i in range(img_array.shape[0]):
-        img_array[i, :] = wavelet_transform(img_array[i, :])
-
-
-    for i in range(img_array.shape[1]):
-        img_array[:, i] = wavelet_transform(img_array[:, i])
-
-
-    for _ in range(level):
-        img_array[:2 ** (level - 1), :2 ** (level - 1)] = 0
-
-
-    for i in range(img_array.shape[0]):
-        img_array[i, :] = inverse_wavelet_transform(img_array[i, :])
-
-
-    for i in range(img_array.shape[1]):
-        img_array[:, i] = inverse_wavelet_transform(img_array[:, i])
-
-
-    img_array = np.clip(img_array, 0, 255).astype(np.uint8)
-
-
-    compressed_img = Image.fromarray(img_array)
-    compressed_img.save(output_path)
-
-
-input_image_path = 'benchmark.bmp'
+input_image_path = 'testes\cubo.tif'
 output_compressed_image_path = 'output_compressed_image.bmp'
 
 compression_level = 5
