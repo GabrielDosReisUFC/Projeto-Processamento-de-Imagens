@@ -80,11 +80,11 @@ def img_from_dwt_coeff(coeff_dwt):
     for i in range(width):
         for j in range(height):
             R = cARed[i][j]
-            R = R/cAMaxRed*100.0
+            R = numpy.clip((R/cAMaxRed)*120.0,0,255)
             G = cAGreen[i][j]
-            G =G/cAMaxGreen*100.0
+            G = numpy.clip((G/cAMaxGreen)*120.0,0,255)
             B = cABlue[i][j]
-            B = B/cAMaxBlue*100.0
+            B = numpy.clip((B/cAMaxBlue)*120.0,0,255)
             new_value = (int(R), int(G), int(B))
             dwt_img.putpixel((i, j), new_value)
    
