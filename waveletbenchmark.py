@@ -2,7 +2,7 @@ import numpy as np
 import pywt
 from PIL import Image
 
-def compress_image(image_path, output_path, num_levels=2):
+def compress_image(image_path, output_path='nome', num_levels=2):
     # Load the image
     original_image = Image.open(image_path)
 
@@ -21,10 +21,10 @@ def compress_image(image_path, output_path, num_levels=2):
     compressed_image_array = np.stack([compressed_red, compressed_green, compressed_blue], axis=-1)
 
     # Convert the array back to a Pillow image
-    compressed_image = Image.fromarray(np.uint8(compressed_image_array))
+    return Image.fromarray(np.uint8(compressed_image_array))
 
     # Save the compressed image
-    compressed_image.save(output_path)
+    # compressed_image.save(output_path)
 
 def compress_channel(channel, num_levels):
     # Apply 2D Discrete Wavelet Transform

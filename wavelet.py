@@ -5,7 +5,6 @@ from PIL import Image, ImageEnhance
 def max_ndarray(mat):
     return numpy.amax(mat) if type(mat).__name__ == 'ndarray' else 0
 
-
 def get_image_dimensions(imagefile):             # Function to get the dimensions of the image
     with Image.open(imagefile) as img:
         width, height = img.size
@@ -38,7 +37,6 @@ def extract_rgb_coeff(img):
 def img_from_dwt_coeff(coeff_dwt):
     # Channel Red
     (coeffs_r, coeffs_g, coeffs_b) = coeff_dwt
-    cc = numpy.array((coeffs_r, coeffs_g, coeffs_b))
     (width, height) = (len(coeffs_r[0]), len(coeffs_r[0][0]))
     cARed = numpy.array(coeffs_r[0])
     cHRed = numpy.array(coeffs_r[1][0])
@@ -82,11 +80,11 @@ def img_from_dwt_coeff(coeff_dwt):
     for i in range(width):
         for j in range(height):
             R = cARed[i][j]
-            R = (R/cAMaxRed)*100.0
+            R = numpy.clip((R/cAMaxRed)*250.0,0,255)
             G = cAGreen[i][j]
-            G = (G/cAMaxGreen)*100.0
+            G = numpy.clip((G/cAMaxGreen)*250.0,0,255)
             B = cABlue[i][j]
-            B = (B/cAMaxBlue)*100.0
+            B = numpy.clip((B/cAMaxBlue)*250.0,0,255)
             new_value = (int(R), int(G), int(B))
             dwt_img.putpixel((i, j), new_value)
    
@@ -101,16 +99,16 @@ def compress(file):
     '''
     Below lines of the code are to resize and enhance the images
     '''
-    enhancer = ImageEnhance.Brightness(image)
-    image = enhancer.enhance(2)
+    #enhancer = ImageEnhance.Brightness(image)
+    #image = enhancer.enhance(2)
    
     file_enh = "enhanced.bmp"
-    image.save(file_enh)
+    # image.save(file_enh)
     im = Image.open(file_enh)
     size = get_image_dimensions(file)
-    im_resized = im.resize(size, Image.ANTIALIAS)
-    #im_resized.save(file_comp)
+    im_resized = im.resize(size)
+    # im_resized.save("file_comp.bmp")
     
     return im_resized
 
-compress("benchmark.bmp")
+# compress("benchmark.bmp")
