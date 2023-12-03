@@ -80,11 +80,11 @@ def img_from_dwt_coeff(coeff_dwt):
     for i in range(width):
         for j in range(height):
             R = cARed[i][j]
-            R = numpy.clip((R/cAMaxRed)*250.0,0,255)
+            R = R/cAMaxRed*100.0
             G = cAGreen[i][j]
-            G = numpy.clip((G/cAMaxGreen)*250.0,0,255)
+            G =G/cAMaxGreen*100.0
             B = cABlue[i][j]
-            B = numpy.clip((B/cAMaxBlue)*250.0,0,255)
+            B = B/cAMaxBlue*100.0
             new_value = (int(R), int(G), int(B))
             dwt_img.putpixel((i, j), new_value)
    
@@ -99,8 +99,8 @@ def compress(file):
     '''
     Below lines of the code are to resize and enhance the images
     '''
-    #enhancer = ImageEnhance.Brightness(image)
-    #image = enhancer.enhance(2)
+    enhancer = ImageEnhance.Brightness(image)
+    image = enhancer.enhance(2)
    
     file_enh = "enhanced.bmp"
     # image.save(file_enh)
@@ -111,4 +111,4 @@ def compress(file):
     
     return im_resized
 
-# compress("benchmark.bmp")
+compress("benchmark.bmp")
