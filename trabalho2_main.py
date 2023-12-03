@@ -82,17 +82,18 @@ class JanelaApp:
     def compactar(self):
         valido = self.validar()
         if valido:
-            compressed_img = wavelet.compress(self.nome_arquivo.get())
+            compressed_img,size = wavelet.compress(self.nome_arquivo.get())
             encoded_data = codificacao_preditiva.predictive_coding_encode(compressed_img)
-            huffman.compress_array(encoded_data,self.nome_arquivo_novo.get()+".grl")
+            huffman.compress_array(encoded_data,self.nome_arquivo_novo.get()+".grl",size)
             self.nome_arquivo_novo.set(os.path.basename(self.nome_arquivo_novo.get()))
             self.tamanho_arquivo_novo.set(f"{os.path.getsize(self.nome_arquivo_novo.get()+'.grl')} bytes")
 
     def descompactar(self):
         valido = self.validar()
         if valido:
-            imagem_codificada =huffman.decompress_image(self.nome_arquivo.get())
-            codificacao_preditiva.decodificacao_preditiva(imagem_codificada,self.nome_arquivo_novo.get()+".bmp")
+            imagem_decodificada,size =huffman.decompress_image(self.nome_arquivo.get())
+            img = codificacao_preditiva.decodificacao_preditiva(imagem_decodificada)
+            wavelet.decompress(img,size,f'{self.nome_arquivo_novo.get()+".bmp"}')
             self.nome_arquivo_novo.set(os.path.basename(self.nome_arquivo_novo.get()))
             self.tamanho_arquivo_novo.set(f"{os.path.getsize(self.nome_arquivo_novo.get()+'.bmp')} bytes")
 

@@ -27,7 +27,7 @@ def predictive_coding_encode(caminho):
     return imagem_copia 
 
 
-def decodificacao_preditiva(imagem_codificada,saida):
+def decodificacao_preditiva(imagem_codificada):
     largura, altura, canais = imagem_codificada.shape
     imagem_decodificada = np.zeros((largura, altura, canais), dtype=np.int16)
     for i in range(largura):
@@ -47,4 +47,4 @@ def decodificacao_preditiva(imagem_codificada,saida):
     imagem_decodificada = imagem_decodificada.astype(np.uint8)
     
     img = Image.fromarray(imagem_decodificada)
-    img.save(saida)
+    return img

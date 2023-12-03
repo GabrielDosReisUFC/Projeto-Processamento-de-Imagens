@@ -106,9 +106,14 @@ def compress(file):
     # image.save(file_enh)
     im = Image.open(file_enh)
     size = get_image_dimensions(file)
-    im_resized = im.resize(size)
+    # im_resized = im.resize(size)
     # im_resized.save("file_comp.bmp")
     
-    return im_resized
+    return image,size
 
-compress("benchmark.bmp")
+def decompress(im,size,saida):
+    im_resized = im.resize(size)
+    im_resized.save(saida)
+    
+
+# compress("benchmark.bmp")

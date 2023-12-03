@@ -99,6 +99,12 @@ def codificar_cabecalho(image, bitstream):
     width_bits = preencher(binario_lista(image.shape[1]), 16)
     bitstream.write_bits(width_bits)
 
+def salvar_size(size, bitstream):
+    height_bits = preencher(binario_lista(size[0]), 16)
+    bitstream.write_bits(height_bits)
+    width_bits = preencher(binario_lista(size[1]), 16)
+    bitstream.write_bits(width_bits)
+
 def codificar_arvore(tree, bitstream):
     if type(tree) == tuple:
         bitstream.write_bit(0)
@@ -127,12 +133,13 @@ def compressed_size(counts, codes):
 
     return (header_size + tree_size + pixels_size) / 8
 
-def compress_array(array, out_file_name):
+def compress_array(array, out_file_name,size):
     counts = contar_numeros(array)
     tree = construir_arvore(counts)
     trimmed_tree = podar(tree)
     codes = criar_dicionario(trimmed_tree)
     stream = OutputBitStream(out_file_name)
+    salvar_size(size,stream)
     codificar_cabecalho(array, stream)
     stream.flush() 
     codificar_arvore(trimmed_tree, stream)
@@ -175,6 +182,11 @@ def decodificar_cabecalho(bitstream):
     width = lista_binario(bitstream.read_bits(16))
     return (height, width)
 
+def decodificar_size(bitstream):
+    height = lista_binario(bitstream.read_bits(16))
+    width = lista_binario(bitstream.read_bits(16))
+    return (height, width)
+
 def decodificar_arvore(bitstream):
     flag = bitstream.read_bits(1)[0]
     if flag == 1:
@@ -200,10 +212,11 @@ def decodificar_pixels(height, width, tree, bitstream):
 
 def decompress_image(in_file_name):
     stream = InputBitStream(in_file_name)
+    size = decodificar_size(stream)
     height, width = decodificar_cabecalho(stream)
     stream.flush()
     trimmed_tree = decodificar_arvore(stream)
     stream.flush()
     pixels = decodificar_pixels(height, width, trimmed_tree, stream)
     stream.close()
-    return pixels
+    return pixels,size
